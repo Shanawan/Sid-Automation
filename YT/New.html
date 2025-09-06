@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Image → Video Converter (WebM) — with Transitions</title>
+<style>
+:root{
+  --bg:#fffef5; --panel:#fff; --muted:#ff8c00; --text:#333;
+  --accent:#ffb300; --accent-2:#ff8c00; --border:#ffd89b;
+  --shadow:0 8px 20px rgba(0,0,0,.06); --radius:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;padding:20px;}
+.container{max-width:1100px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+h1{margin:0;color:var(--accent-2)}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:14px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+label{font-size:13px;color:#555}
+input[type="file"]{display:none}
+input.number,input.select{padding:6px 8px;border-radius:8px;border:1px solid var(--border)}
+.btn{appearance:none;border:1px solid transparent;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn.danger{background:transparent;border:1px solid #f5c2c2;color:#ef4444}
+.list{padding:10px;max-height:360px;overflow:auto;border-top:1px solid var(--border);margin-top:10px}
+.item{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:8px;border-radius:10px;border:1px solid #fff;margin-bottom:8px;background:linear-gradient(180deg,#fff,#fffef0)}
+.thumb{width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--border);display:grid;place-items:center}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.meta{display:flex;flex-direction:column;gap:4px}
+.meta .row{gap:6px;align-items:center}
+.actions{display:flex;gap:8px;align-items:center}
+#effectPreviewCanvas{background:#000;border-radius:8px;border:1px solid var(--border);max-width:100%}
+.progress{height:12px;background:#f1f1f1;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+video{width:100%;border-radius:8px;margin-top:10px;background:#000}
+.muted{color:#666;font-size:13px}
+.small{font-size:12px;color:#666}
+footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1>Image → Video Converter</h1><div class="muted">Client-side • WebM only</div></header>
+
+<section class="card">
+  <div class="row" style="justify-content:space-between">
+    <label class="btn">+ Add Images<input id="fileInput" type="file" accept="image/*" multiple></label><label class="btn ghost">+ Add Captions (SRT)<input id="srtInput" type="file" accept=".srt"></label>
+<span id="srtFileName" class="small">No captions loaded</span>
+
+    <div class="small">Tip: add images, set duration and transition for each</div>
+  </div>
+
+  <div style="margin-top:12px" class="row">
+    <label class="small">FPS</label><input id="fps" class="number" type="number" min="1" max="60" value="30" style="width:72px">
+    <label class="small">Resolution</label>
+    <select id="size" class="select">
+      <option value="1920x1080">YouTube (1920×1080)</option>
+      <option value="1080x1920">TikTok (1080×1920)</option>
+      <option value="1080x1080">Instagram (1080×1080)</option>
+      <option value="1280x720">720p (1280×720)</option>
+    </select>
+  </div>
+
+  <div style="margin-top:12px" class="row">
+    <div>Total Video Length: <span id="totalDuration">0s</span></div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="small">Images</div>
+  <div id="list" class="list"></div>
+
+  <div class="preview-row" style="margin-top:10px">
+    <div style="flex:1">
+      <div class="small">Effect Preview</div>
+      <canvas id="effectPreviewCanvas" width="480" height="270"></canvas>
+      <div style="margin-top:8px" class="row">
+        <button id="playPreview" class="btn">▶ Play</button>
+        <button id="stopPreview" class="btn ghost">■ Stop</button>
+        <div class="muted" style="margin-left:8px">Click an item to select for preview</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="row" style="gap:8px;align-items:center">
+    <button id="generateBtn" class="btn">▶ Generate Video</button>
+    <button id="cancelBtn" class="btn ghost" style="display:none">✖ Cancel</button>
+  </div>
+  <div style="margin-top:10px">
+    <div class="progress"><div id="bar" class="bar"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px">
+      <div class="small" id="progressPercent">0%</div>
+      <div class="small" id="progressTime">0s / 0s</div>
+    </div>
+    <video id="outVideo" controls playsinline></video>
+    <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+      <a id="downloadLink" class="btn ghost" style="display:none">⬇ Download</a>
+      <div id="statusText" class="small muted"></div>
+    </div>
+  </div>
+</section>
+
+<footer>Built with MediaRecorder + Canvas</footer>
+</div>
+
+<script>
+(async()=>{
+  const state={items:[],nextId:1,selectedItemIdx:-1,captions:[]};
+  const fileInput=document.getElementById('fileInput');
+  const srtInput=document.getElementById('srtInput');
+  const listEl=document.getElementById('list');
+  const fpsInput=document.getElementById('fps');
+  const sizeSelect=document.getElementById('size');
+  const totalDurationEl=document.getElementById('totalDuration');
+  const playPreviewBtn=document.getElementById('playPreview');
+  const stopPreviewBtn=document.getElementById('stopPreview');
+  const previewCanvas=document.getElementById('effectPreviewCanvas');
+  const pctx=previewCanvas.getContext('2d');
+  const generateBtn=document.getElementById('generateBtn');
+  const cancelBtn=document.getElementById('cancelBtn');
+  const barEl=document.getElementById('bar');
+  const progressPercent=document.getElementById('progressPercent');
+  const progressTime=document.getElementById('progressTime');
+  const outVideo=document.getElementById('outVideo');
+  const downloadLink=document.getElementById('downloadLink');
+  const statusText=document.getElementById('statusText');
+  const srtFileName=document.getElementById('srtFileName');
+  const canvas=document.createElement('canvas');
+  const ctx=canvas.getContext('2d');
+
+  let previewRAF=null;
+  let mediaRecorder=null,recordedChunks=[],cancelled=false;
+
+  // Update total video duration
+  function updateTotalDuration(){
+    let total=0;
+    state.items.forEach(it=>total+=parseFloat(it.duration || 3));
+    totalDurationEl.textContent=Math.round(total)+'s';
+  }
+
+  // Render image list with duration & transition
+  function renderList(){
+    listEl.innerHTML='';
+    state.items.forEach((it,idx)=>{
+      const row=document.createElement('div');
+      row.className='item';
+      row.dataset.idx=idx;
+      row.innerHTML=`
+        <div class="thumb"><img src="${it.url}"></div>
+        <div class="meta">
+          <div class="name">${it.file.name}</div>
+          <div class="sub small">Res: ${it.img.naturalWidth}×${it.img.naturalHeight}</div>
+          <div class="row">
+            <label class="small">Duration</label>
+            <input data-idx="${idx}" class="number dur" type="number" value="${it.duration}" min="0.2" step="0.1" style="width:60px">
+            <label class="small">Transition</label>
+            <select data-idx="${idx}" class="select tr">
+              <option value="none">None</option>
+              <option value="fade">Fade</option>
+              <option value="zoomIn">Zoom In</option>
+              <option value="zoomOut">Zoom Out</option>
+              <option value="rotate">Rotate</option>
+              <option value="leftToRight">Left → Right</option>
+              <option value="rightToLeft">Right → Left</option>
+              <option value="panUp">Pan Up</option>
+              <option value="panDown">Pan Down</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn ghost up">▲</button>
+          <button class="btn ghost down">▼</button>
+          <button class="btn ghost remove">Remove</button>
+        </div>`;
+      listEl.appendChild(row);
+
+      row.querySelector('.dur').addEventListener('input',e=>{ state.items[idx].duration=parseFloat(e.target.value)||3; updateTotalDuration(); });
+      const sel=row.querySelector('.tr'); sel.value=it.transition||'none';
+      sel.addEventListener('change',e=>state.items[idx].transition=e.target.value);
+      row.querySelector('.remove').addEventListener('click',()=>{ state.items.splice(idx,1); renderList(); updateTotalDuration(); });
+      row.querySelector('.up').addEventListener('click',()=>{ if(idx>0){ [state.items[idx-1],state.items[idx]]=[state.items[idx],state.items[idx-1]]; renderList(); } });
+      row.querySelector('.down').addEventListener('click',()=>{ if(idx<state.items.length-1){ [state.items[idx+1],state.items[idx]]=[state.items[idx],state.items[idx+1]]; renderList(); } });
+
+      row.addEventListener('click',()=>{ state.selectedItemIdx=idx; Array.from(listEl.children).forEach((r,i)=>r.style.outline=(i===idx)?'2px solid rgba(255,140,0,0.35)':''); });
+    });
+  }
+
+  // Add images
+  fileInput.addEventListener('change',async e=>{
+    const files=Array.from(e.target.files||[]);
+    for(const f of files){
+      if(!f.type.startsWith('image/')) continue;
+      const url=URL.createObjectURL(f);
+      const img=new Image();
+      await new Promise(r=>{ img.onload=r; img.src=url; });
+      state.items.push({id:state.nextId++,file:f,url,img,duration:3,transition:'fade'});
+    }
+    renderList(); updateTotalDuration();
+  });
+
+  // Parse SRT captions
+  srtInput.addEventListener('change',async e=>{
+    const file=e.target.files[0];
+    if(!file) return;
+    const text=await file.text();
+    state.captions=parseSRT(text);
+    srtFileName.textContent=file.name;
+  });
+
+  function parseSRT(data){
+    const blocks=data.split(/\r?\n\r?\n/);
+    return blocks.map(b=>{
+      const lines=b.split(/\r?\n/);
+      if(lines.length>=3){
+        const times=lines[1].split(' --> ');
+        return {start:toSeconds(times[0]),end:toSeconds(times[1]),text:lines.slice(2).join('\n')};
+      }
+    }).filter(Boolean);
+  }
+
+  function toSeconds(str){
+    const m=str.match(/(\d+):(\d+):(\d+),(\d+)/);
+    return parseInt(m[1])*3600 + parseInt(m[2])*60 + parseInt(m[3]) + parseInt(m[4])/1000;
+  }
+
+  function drawCaption(ctx,caption,text,yOffset=50,fontSize=36){
+    const captionBg='black';
+    const captionColor='white';
+    ctx.font = `${fontSize}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const lines=text.split('\n');
+    lines.forEach((line,i)=>{
+      const x=ctx.canvas.width/2;
+      const y=ctx.canvas.height-yOffset-(lines.length-i-1)*(fontSize+4);
+      const width=ctx.measureText(line).width + 20;
+      const height=fontSize + 10;
+      ctx.globalAlpha=0.6;
+      ctx.fillStyle=captionBg;
+      ctx.fillRect(x-width/2,y-height/2,width,height);
+      ctx.globalAlpha=1;
+      ctx.fillStyle=captionColor;
+      ctx.fillText(line,x,y);
+    });
+  }
+
+  // Preview animation with captions
+  function playPreview(){
+    if(state.selectedItemIdx<0) return alert('Select an image');
+    const it=state.items[state.selectedItemIdx];
+    cancelAnimationFrame(previewRAF);
+    const W=previewCanvas.width,H=previewCanvas.height;
+    const src=it.img;
+    const frames=Math.round((it.duration||3)*parseInt(fpsInput.value||30));
+    let frame=0;
+    let videoTime=0;
+    function draw(){
+      pctx.fillStyle='#000';pctx.fillRect(0,0,W,H);
+      const t=frame/(frames-1);
+      let x=0,y=0,w=W,h=H;
+      switch(it.transition){
+        case 'zoomIn': { const s=1+0.2*t; w=W*s; h=H*s; x=(W-w)/2; y=(H-h)/2; break; }
+        case 'zoomOut': { const s=1.2-0.2*t; w=W*s; h=H*s; x=(W-w)/2; y=(H-h)/2; break; }
+        case 'rotate': { pctx.save(); pctx.translate(W/2,H/2); pctx.rotate(t*2*Math.PI); pctx.drawImage(src,-W/2,-H/2,W,H); pctx.restore(); break; }
+        case 'leftToRight': { x=W*t; break; }
+        case 'rightToLeft': { x=-W*t; break; }
+        case 'panUp': { y=-H*t; break; }
+        case 'panDown': { y=H*t; break; }
+        case 'fade': pctx.globalAlpha=t; break;
+      }
+      if(it.transition!=='rotate') pctx.drawImage(src,x,y,W,H);
+      pctx.globalAlpha=1;
+
+      // Draw captions
+      state.captions.forEach(c=>{
+        if(videoTime>=c.start && videoTime<=c.end){
+          drawCaption(pctx,c.text);
+        }
+      });
+
+      frame++; videoTime+=1/parseInt(fpsInput.value||30);
+      if(frame<frames) previewRAF=requestAnimationFrame(draw);
+    }
+    draw();
+  }
+  function stopPreview(){ cancelAnimationFrame(previewRAF); previewRAF=null; }
+
+  playPreviewBtn.addEventListener('click',playPreview);
+  stopPreviewBtn.addEventListener('click',stopPreview);
+
+  // Generate video with captions
+  generateBtn.addEventListener('click',async()=>{
+    if(state.items.length===0) return alert('Add images first');
+    cancelled=false; cancelBtn.style.display='inline-block'; generateBtn.disabled=true; statusText.textContent='Starting...';
+    const fps=parseInt(fpsInput.value)||30;
+    const [w,h]=sizeSelect.value.split('x').map(Number);
+    canvas.width=w; canvas.height=h;
+    const stream=canvas.captureStream(fps);
+    recordedChunks=[]; 
+    mediaRecorder=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9'});
+    mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) recordedChunks.push(e.data); };
+    mediaRecorder.start();
+    const totalFrames=state.items.reduce((acc,it)=>acc+Math.round((it.duration||3)*fps),0);
+    let frameCount=0;
+    let videoTime=0;
+
+    for(const it of state.items){
+      const frames=Math.round((it.duration||3)*fps);
+      for(let f=0;f<frames;f++){
+        if(cancelled) break;
+        ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
+        const t=f/(frames-1);
+        let x=0,y=0,fw=w,fh=h;
+        switch(it.transition){
+          case 'zoomIn': { const s=1+0.2*t; fw=w*s; fh=h*s; x=(w-fw)/2; y=(h-fh)/2; break; }
+          case 'zoomOut': { const s=1.2-0.2*t; fw=w*s; fh=h*s; x=(w-fw)/2; y=(h-fh)/2; break; }
+          case 'rotate': { ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(t*2*Math.PI); ctx.drawImage(it.img,-w/2,-h/2,w,h); ctx.restore(); break; }
+          case 'leftToRight': { x=w*t; break; }
+          case 'rightToLeft': { x=-w*t; break; }
+          case 'panUp': { y=-h*t; break; }
+          case 'panDown': { y=h*t; break; }
+          case 'fade': ctx.globalAlpha=t; break;
+        }
+        if(it.transition!=='rotate') ctx.drawImage(it.img,x,y,fw,fh);
+        ctx.globalAlpha=1;
+
+        // Draw captions
+        state.captions.forEach(c=>{
+          if(videoTime>=c.start && videoTime<=c.end){
+            drawCaption(ctx,c.text);
+          }
+        });
+
+        frameCount++; videoTime+=1/fps;
+        barEl.style.width=Math.round(100*frameCount/totalFrames)+'%';
+        progressPercent.textContent=Math.round(100*frameCount/totalFrames)+'%';
+        progressTime.textContent=Math.round(videoTime)+'s / '+Math.round(totalFrames/fps)+'s';
+        await new Promise(r=>setTimeout(r,1000/fps));
+      }
+      if(cancelled) break;
+    }
+
+    mediaRecorder.stop();
+    await new Promise(r=>mediaRecorder.onstop=r);
+    cancelBtn.style.display='none'; generateBtn.disabled=false;
+    statusText.textContent='Video ready';
+    const blob=new Blob(recordedChunks,{type:'video/webm'});
+    const url=URL.createObjectURL(blob);
+    outVideo.src=url; downloadLink.href=url; downloadLink.style.display='inline-block';
+  });
+
+  cancelBtn.addEventListener('click',()=>{ cancelled=true; statusText.textContent='Cancelled'; });
+})();
+
+</script>
+</body>
+</html>
