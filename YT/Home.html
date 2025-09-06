@@ -3,289 +3,809 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Image → Video Converter (WebM) — with Transitions</title>
+<title>Image → Video Converter (Sid Creative) — </title>
 <style>
-:root{
-  --bg:#fffef5; --panel:#fff; --muted:#ff8c00; --text:#333;
-  --accent:#ffb300; --accent-2:#ff8c00; --border:#ffd89b;
-  --shadow:0 8px 20px rgba(0,0,0,.06); --radius:12px;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;padding:20px;}
-.container{max-width:1100px;margin:0 auto}
-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-h1{margin:0;color:var(--accent-2)}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:14px}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-label{font-size:13px;color:#555}
-input[type="file"]{display:none}
-input.number,input.select{padding:6px 8px;border-radius:8px;border:1px solid var(--border)}
-.btn{appearance:none;border:1px solid transparent;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
-.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
-.btn.danger{background:transparent;border:1px solid #f5c2c2;color:#ef4444}
-.list{padding:10px;max-height:360px;overflow:auto;border-top:1px solid var(--border);margin-top:10px}
-.item{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:8px;border-radius:10px;border:1px solid #fff;margin-bottom:8px;background:linear-gradient(180deg,#fff,#fffef0)}
-.thumb{width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--border);display:grid;place-items:center}
-.thumb img{width:100%;height:100%;object-fit:cover}
-.meta{display:flex;flex-direction:column;gap:4px}
-.meta .row{gap:6px;align-items:center}
-.actions{display:flex;gap:8px;align-items:center}
-#effectPreviewCanvas{background:#000;border-radius:8px;border:1px solid var(--border);max-width:100%}
-.progress{height:12px;background:#f1f1f1;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
-.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
-video{width:100%;border-radius:8px;margin-top:10px;background:#000}
-.muted{color:#666;font-size:13px}
-.small{font-size:12px;color:#666}
-footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
+  :root{
+    --bg:#fffef5; --panel:#fff; --muted:#ff8c00; --text:#333;
+    --accent:#ffb300; --accent-2:#ff8c00; --danger:#ef4444; --border:#ffd89b;
+    --shadow:0 8px 20px rgba(0,0,0,.06); --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;padding:20px;}
+  .container{max-width:1100px;margin:0 auto}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  h1{margin:0;color:var(--accent-2)}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:14px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  label{font-size:13px;color:#555}
+  input[type="file"]{display:none}
+  .btn{appearance:none;border:1px solid transparent;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
+  .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+  .btn.danger{background:transparent;border:1px solid #f5c2c2;color:var(--danger)}
+  .select,.number{background:#fff;border:1px solid var(--border);padding:8px;border-radius:8px}
+  .list{padding:10px;max-height:360px;overflow:auto;border-top:1px solid var(--border);margin-top:10px}
+  .item{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:8px;border-radius:10px;border:1px solid #fff;margin-bottom:8px;background:linear-gradient(180deg,#fff,#fffef0)}
+  .thumb{width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--border);display:grid;place-items:center}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .meta{display:flex;flex-direction:column;gap:6px}
+  .meta .name{font-weight:600;font-size:14px}
+  .meta .sub{font-size:12px;color:#777}
+  .actions{display:flex;gap:8px;align-items:center}
+  .preview-row{display:flex;gap:12px;align-items:flex-start}
+  #effectPreviewCanvas{background:#000;border-radius:8px;border:1px solid var(--border);max-width:100%}
+  .caption-preview{width:100%;height:80px;background:#111827;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-top:8px;color:#fff}
+  .progress{height:12px;background:#f1f1f1;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+  .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+  video{width:100%;border-radius:8px;margin-top:10px;background:#000}
+  .muted{color:#666;font-size:13px}
+  .small{font-size:12px;color:#666}
+  footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
 </style>
 </head>
 <body>
-<div class="container">
-<header><h1>Image → Video Converter</h1><div class="muted">Client-side • WebM only</div></header>
+  <div class="container">
+    <header><h1>Image → Video Converter</h1><div class="muted">Client-side • No server</div></header>
 
-<section class="card">
-  <div class="row" style="justify-content:space-between">
-    <label class="btn">+ Add Images<input id="fileInput" type="file" accept="image/*" multiple></label>
-    <div class="small">Tip: add images, set duration and transition for each</div>
-  </div>
-
-  <div style="margin-top:12px" class="row">
-    <label class="small">FPS</label><input id="fps" class="number" type="number" min="1" max="60" value="30" style="width:72px">
-    <label class="small">Resolution</label>
-    <select id="size" class="select">
-      <option value="1920x1080">YouTube (1920×1080)</option>
-      <option value="1080x1920">TikTok (1080×1920)</option>
-      <option value="1080x1080">Instagram (1080×1080)</option>
-      <option value="1280x720">720p (1280×720)</option>
-    </select>
-  </div>
-
-  <div style="margin-top:12px" class="row">
-    <div>Total Video Length: <span id="totalDuration">0s</span></div>
-  </div>
-</section>
-
-<section class="card">
-  <div class="small">Images</div>
-  <div id="list" class="list"></div>
-
-  <div class="preview-row" style="margin-top:10px">
-    <div style="flex:1">
-      <div class="small">Effect Preview</div>
-      <canvas id="effectPreviewCanvas" width="480" height="270"></canvas>
-      <div style="margin-top:8px" class="row">
-        <button id="playPreview" class="btn">▶ Play</button>
-        <button id="stopPreview" class="btn ghost">■ Stop</button>
-        <div class="muted" style="margin-left:8px">Click an item to select for preview</div>
+    <section class="card">
+      <div class="row" style="justify-content:space-between">
+        <div class="row" style="gap:8px;align-items:center">
+          <label class="btn">+ Add Images<input id="fileInput" type="file" accept="image/*" multiple></label>
+          <span class="small">Tip: add multiple images then set duration/effect per item</span>
+        </div>
+        <div class="row" style="gap:8px;align-items:center">
+          <label class="small">FPS</label><input id="fps" class="number" type="number" min="1" max="60" value="30" style="width:72px">
+          <label class="small">Resolution</label>
+          <select id="size" class="select">
+            <option value="1920x1080">YouTube (1920×1080)</option>
+            <option value="1080x1920">TikTok (1080×1920)</option>
+            <option value="1080x1080">Instagram (1080×1080)</option>
+            <option value="1280x720">720p (1280×720)</option>
+          </select>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
 
-<section class="card">
-  <div class="row" style="gap:8px;align-items:center">
-    <button id="generateBtn" class="btn">▶ Generate Video</button>
-    <button id="cancelBtn" class="btn ghost" style="display:none">✖ Cancel</button>
-  </div>
-  <div style="margin-top:10px">
-    <div class="progress"><div id="bar" class="bar"></div></div>
-    <div style="display:flex;justify-content:space-between;margin-top:6px">
-      <div class="small" id="progressPercent">0%</div>
-      <div class="small" id="progressTime">0s / 0s</div>
-    </div>
-    <video id="outVideo" controls playsinline></video>
-    <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-      <a id="downloadLink" class="btn ghost" style="display:none">⬇ Download</a>
-      <div id="statusText" class="small muted"></div>
-    </div>
-  </div>
-</section>
+      <div style="margin-top:12px" class="row"> 
+        <label class="btn ghost">+ Add Audio<input id="audioInput" type="file" accept="audio/*"></label>
+        <label class="small"><input id="loopAudio" type="checkbox"> Loop audio</label>
+        <label class="btn ghost">+ Add Captions (SRT)<input id="srtInput" type="file" accept=".srt"></label>
+        <span id="srtFileName" class="small" style="margin-left:6px">No captions loaded</span>
+      </div>
 
-<footer>Built with MediaRecorder + Canvas</footer>
-</div>
+      <div style="margin-top:12px" class="row">
+        <div style="display:flex;gap:8px;align-items:center">
+          <label class="small">Caption Color</label><input id="captionColor" type="color" value="#ffffff">
+          <label class="small">Caption BG</label><input id="captionBg" type="color" value="#000000">
+          <label class="small">Position</label>
+          <select id="captionPosition" class="select">
+            <option value="bottom">Bottom</option>
+            <option value="top">Top</option>
+            <option value="center">Center</option>
+          </select>
+        </div>
 
-<script>
-(async()=>{
-  const state={items:[],nextId:1,selectedItemIdx:-1};
-  const fileInput=document.getElementById('fileInput');
-  const listEl=document.getElementById('list');
-  const fpsInput=document.getElementById('fps');
-  const sizeSelect=document.getElementById('size');
-  const totalDurationEl=document.getElementById('totalDuration');
-  const playPreviewBtn=document.getElementById('playPreview');
-  const stopPreviewBtn=document.getElementById('stopPreview');
-  const previewCanvas=document.getElementById('effectPreviewCanvas');
-  const pctx=previewCanvas.getContext('2d');
-  const generateBtn=document.getElementById('generateBtn');
-  const cancelBtn=document.getElementById('cancelBtn');
-  const barEl=document.getElementById('bar');
-  const progressPercent=document.getElementById('progressPercent');
-  const progressTime=document.getElementById('progressTime');
-  const outVideo=document.getElementById('outVideo');
-  const downloadLink=document.getElementById('downloadLink');
-  const statusText=document.getElementById('statusText');
-  const canvas=document.createElement('canvas');
-  const ctx=canvas.getContext('2d');
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+          <label class="small">Output</label>
+          <select id="outputFormat" class="select">
+            <option value="webm">WebM</option>
+            <option value="mp4">MP4 (convert)</option>
+          </select>
+        </div>
+      </div>
+    </section>
 
-  let previewRAF=null;
-  let mediaRecorder=null,recordedChunks=[],cancelled=false;
+    <section class="card">
+      <div class="small">Images</div>
+      <div id="list" class="list"></div>
 
-  // Compute total video length
-  function updateTotalDuration(){
-    let total=0;
-    state.items.forEach(it=>total+=parseFloat(it.duration || 3));
-    totalDurationEl.textContent=Math.round(total)+'s';
-  }
-
-  // Render image list
-  function renderList(){
-    listEl.innerHTML='';
-    state.items.forEach((it,idx)=>{
-      const row=document.createElement('div');
-      row.className='item';
-      row.dataset.idx=idx;
-      row.innerHTML=`
-        <div class="thumb"><img src="${it.url}"></div>
-        <div class="meta">
-          <div class="name">${it.file.name}</div>
-          <div class="sub small">Res: ${it.img.naturalWidth}×${it.img.naturalHeight}</div>
-          <div class="row">
-            <label class="small">Duration</label>
-            <input data-idx="${idx}" class="number dur" type="number" value="${it.duration}" min="0.2" step="0.1" style="width:60px">
-            <label class="small">Transition</label>
-            <select data-idx="${idx}" class="select tr">
-              <option value="none">None</option>
-              <option value="fade">Fade</option>
-              <option value="zoomIn">Zoom In</option>
-              <option value="zoomOut">Zoom Out</option>
-              <option value="rotate">Rotate</option>
-              <option value="leftToRight">Left → Right</option>
-              <option value="rightToLeft">Right → Left</option>
-              <option value="panUp">Pan Up</option>
-              <option value="panDown">Pan Down</option>
-            </select>
+      <div class="preview-row" style="margin-top:10px">
+        <div style="flex:1">
+          <div class="small">Effect Preview</div>
+          <canvas id="effectPreviewCanvas" width="480" height="270"></canvas>
+          <div style="margin-top:8px" class="row">
+            <button id="playPreview" class="btn">▶ Play</button>
+            <button id="stopPreview" class="btn ghost">■ Stop</button>
+            <div class="muted" style="margin-left:8px">Click an item to select for preview</div>
           </div>
         </div>
-        <div class="actions">
-          <button class="btn ghost up">▲</button>
-          <button class="btn ghost down">▼</button>
-          <button class="btn ghost remove">Remove</button>
-        </div>`;
-      listEl.appendChild(row);
 
-      row.querySelector('.dur').addEventListener('input',e=>{ state.items[idx].duration=parseFloat(e.target.value)||3; updateTotalDuration(); });
-      const sel=row.querySelector('.tr'); sel.value=it.transition||'none';
-      sel.addEventListener('change',e=>state.items[idx].transition=e.target.value);
-      row.querySelector('.remove').addEventListener('click',()=>{ state.items.splice(idx,1); renderList(); updateTotalDuration(); });
-      row.querySelector('.up').addEventListener('click',()=>{ if(idx>0){ [state.items[idx-1],state.items[idx]]=[state.items[idx],state.items[idx-1]]; renderList(); } });
-      row.querySelector('.down').addEventListener('click',()=>{ if(idx<state.items.length-1){ [state.items[idx+1],state.items[idx]]=[state.items[idx],state.items[idx+1]]; renderList(); } });
+        <div style="width:320px;margin-left:12px">
+          <div class="small">Caption Live Preview</div>
+          <div id="captionPreview" class="caption-preview"><span id="captionTextPreview">Sample caption text</span></div>
+          <div class="small" style="margin-top:8px">(Preview shows caption style & position — final video uses uploaded SRT timing)</div>
+        </div>
+      </div>
+    </section>
 
-      row.addEventListener('click',()=>{ state.selectedItemIdx=idx; Array.from(listEl.children).forEach((r,i)=>r.style.outline=(i===idx)?'2px solid rgba(255,140,0,0.35)':''); });
-    });
-  }
+    <section class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div class="row" style="gap:8px">
+          <button id="generateBtn" class="btn">▶ Generate Video</button>
+          <button id="cancelBtn" class="btn ghost" style="display:none">✖ Cancel</button>
+        </div>
+        <div style="min-width:300px">
+          <div class="progress"><div id="bar" class="bar"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px">
+            <div class="small" id="progressPercent">0%</div>
+            <div class="small" id="progressTime">0s / 0s</div>
+          </div>
+        </div>
+      </div>
 
-  // Add images
-  fileInput.addEventListener('change',async e=>{
-    const files=Array.from(e.target.files||[]);
-    for(const f of files){
-      if(!f.type.startsWith('image/')) continue;
-      const url=URL.createObjectURL(f);
-      const img=new Image();
-      await new Promise(r=>{ img.onload=r; img.src=url; });
-      state.items.push({id:state.nextId++,file:f,url,img,duration:3,transition:'fade'});
-    }
-    renderList(); updateTotalDuration();
-  });
+      <div style="margin-top:10px">
+        <video id="outVideo" controls playsinline></video>
+        <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+          <a id="downloadLink" class="btn ghost" style="display:none">⬇ Download</a>
+          <div id="statusText" class="small muted"></div>
+        </div>
+      </div>
+    </section>
 
-  // Compute cover rect
-  function computeCoverRect(sw,sh,dw,dh){ const sr=sw/sh,dr=dw/dh; if(sr>dr){ const h=dh,w=h*sr,x=(dw-w)/2; return {x,y:0,w,h}; } else { const w=dw,h=w/sr,y=(dh-h)/2; return {x:0,y,w,h}; } }
+    <footer>Built with ffmpeg.wasm + async-thread-worker</footer>
+  </div>
 
-  // Preview animation
-  function playPreview(){
-    if(state.selectedItemIdx<0) return alert('Select an image');
-    const it=state.items[state.selectedItemIdx];
-    cancelAnimationFrame(previewRAF);
-    const W=previewCanvas.width,H=previewCanvas.height;
-    const src=it.img;
-    const frames=Math.round((it.duration||3)*parseInt(fpsInput.value||30));
-    let frame=0;
-    function draw(){
-      pctx.fillStyle='#000';pctx.fillRect(0,0,W,H);
-      const t=frame/(frames-1);
-      let x=0,y=0,w=W,h=H;
-      switch(it.transition){
-        case 'zoomIn': { const s=1+0.2*t; w=W*s; h=H*s; x=(W-w)/2; y=(H-h)/2; break; }
-        case 'zoomOut': { const s=1.2-0.2*t; w=W*s; h=H*s; x=(W-w)/2; y=(H-h)/2; break; }
-        case 'rotate': { pctx.save(); pctx.translate(W/2,H/2); pctx.rotate(t*2*Math.PI); pctx.drawImage(src,-W/2,-H/2,W,H); pctx.restore(); break; }
-        case 'leftToRight': { x=W*t; break; }
-        case 'rightToLeft': { x=-W*t; break; }
-        case 'panUp': { y=-H*t; break; }
-        case 'panDown': { y=H*t; break; }
-        case 'fade': pctx.globalAlpha=t; break;
-      }
-      if(it.transition!=='rotate'){ pctx.drawImage(src,x,y,W,H); pctx.globalAlpha=1; }
-      frame++; if(frame<frames) previewRAF=requestAnimationFrame(draw);
-    }
-    draw();
-  }
-  function stopPreview(){ cancelAnimationFrame(previewRAF); previewRAF=null; }
+  <!-- libs -->
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
+  <script src="https://w3reality.github.io/async-thread-worker/dist/async-thread-worker.min.js"></script>
 
-  playPreviewBtn.addEventListener('click',playPreview);
-  stopPreviewBtn.addEventListener('click',stopPreview);
+  <script>
+  (function(){
+    // ====== state ======
+    const state = {
+      items: [],       // {id,file,url,img,duration,effect,preImg}
+      nextId: 1,
+      audioFile: null,
+      srtEntries: [],  // [{start,end,text}]
+      captionSettings: { color:'#ffffff', bg:'#000000', pos:'bottom' },
+      selectedItemIdx: -1,
+      audioElement: null,
+      ffmpegThread: null,
+    };
 
-  // Video generation
-  generateBtn.addEventListener('click',async()=>{
-    if(state.items.length===0) return alert('Add images first');
-    cancelled=false; cancelBtn.style.display='inline-block'; generateBtn.disabled=true; statusText.textContent='Starting...';
-    const fps=parseInt(fpsInput.value)||30;
-    const [w,h]=sizeSelect.value.split('x').map(Number);
-    canvas.width=w; canvas.height=h;
-    const stream=canvas.captureStream(fps);
-    recordedChunks=[]; 
-    mediaRecorder=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9'});
-    mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) recordedChunks.push(e.data); };
-    mediaRecorder.start();
-    const totalFrames=state.items.reduce((acc,it)=>acc+Math.round((it.duration||3)*fps),0);
-    let frameCount=0;
-    function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
-    for(const it of state.items){
-      const frames=Math.round((it.duration||3)*fps);
-      for(let f=0;f<frames;f++){
-        if(cancelled) break;
-        ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
-        const t=f/(frames-1);
-        let x=0,y=0,fw=w,fh=h;
-        switch(it.transition){
-          case 'zoomIn': { const s=1+0.2*t; fw=w*s; fh=h*s; x=(w-fw)/2; y=(h-fh)/2; break; }
-          case 'zoomOut': { const s=1.2-0.2*t; fw=w*s; fh=h*s; x=(w-fw)/2; y=(h-fh)/2; break; }
-          case 'rotate': { ctx.save(); ctx.translate(w/2,h/2); ctx.rotate(t*2*Math.PI); ctx.drawImage(it.img,-w/2,-h/2,w,h); ctx.restore(); break; }
-          case 'leftToRight': { x=w*t; break; }
-          case 'rightToLeft': { x=-w*t; break; }
-          case 'panUp': { y=-h*t; break; }
-          case 'panDown': { y=h*t; break; }
-          case 'fade': ctx.globalAlpha=t; break;
+    // Elements
+    const fileInput = document.getElementById('fileInput');
+    const audioInput = document.getElementById('audioInput');
+    const srtInput = document.getElementById('srtInput');
+    const srtFileName = document.getElementById('srtFileName');
+    const listEl = document.getElementById('list');
+    const playPreviewBtn = document.getElementById('playPreview');
+    const stopPreviewBtn = document.getElementById('stopPreview');
+    const previewCanvas = document.getElementById('effectPreviewCanvas');
+    const pctx = previewCanvas.getContext('2d');
+    const captionTextPreview = document.getElementById('captionTextPreview');
+    const captionPreview = document.getElementById('captionPreview');
+
+    const captionColor = document.getElementById('captionColor');
+    const captionBg = document.getElementById('captionBg');
+    const captionPosition = document.getElementById('captionPosition');
+
+    const fpsInput = document.getElementById('fps');
+    const sizeSelect = document.getElementById('size');
+    const loopAudioCheckbox = document.getElementById('loopAudio');
+    const outputFormat = document.getElementById('outputFormat');
+
+    const generateBtn = document.getElementById('generateBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const barEl = document.getElementById('bar');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressTime = document.getElementById('progressTime');
+    const outVideo = document.getElementById('outVideo');
+    const downloadLink = document.getElementById('downloadLink');
+    const statusText = document.getElementById('statusText');
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Worker/thread variables
+    let ffmpegThread = null;
+    let ffmpegThreadReady = false;
+
+    // preview animation handle
+    let previewRAF = null;
+
+    // helper: parse SRT
+    function parseSRT(text){
+      const lines = text.split(/\r?\n/);
+      const entries = [];
+      let i = 0;
+      while(i < lines.length){
+        // skip index if present
+        if(/^\d+$/.test(lines[i].trim())) i++;
+        if(i >= lines.length) break;
+        const timesLine = lines[i++].trim();
+        if(!timesLine) continue;
+        const times = timesLine.split('-->');
+        if(times.length < 2) continue;
+        const start = toSec(times[0].trim());
+        const end = toSec(times[1].trim());
+        // collect text
+        let txt = '';
+        while(i < lines.length && lines[i].trim() !== ''){
+          txt += lines[i++] + (lines[i] ? '\n' : '');
         }
-        if(it.transition!=='rotate') ctx.drawImage(it.img,x,y,fw,fh);
-        ctx.globalAlpha=1;
-        frameCount++;
-        barEl.style.width=Math.round(100*frameCount/totalFrames)+'%';
-        progressPercent.textContent=Math.round(100*frameCount/totalFrames)+'%';
-        progressTime.textContent=Math.round(frameCount/fps)+'s / '+Math.round(totalFrames/fps)+'s';
-        await sleep(1000/fps);
+        // skip blank line
+        while(i < lines.length && lines[i].trim() === '') i++;
+        entries.push({start, end, text: txt.trim()});
       }
-      if(cancelled) break;
+      return entries;
     }
-    mediaRecorder.stop();
-    await new Promise(r=>mediaRecorder.onstop=r);
-    cancelBtn.style.display='none'; generateBtn.disabled=false;
-    statusText.textContent='Video ready';
-    const blob=new Blob(recordedChunks,{type:'video/webm'});
-    const url=URL.createObjectURL(blob);
-    outVideo.src=url; downloadLink.href=url; downloadLink.style.display='inline-block';
-  });
+    function toSec(t){
+      // format: hh:mm:ss,ms
+      const m = /(\d+):(\d+):(\d+),(\d+)/.exec(t);
+      if(!m) return 0;
+      return parseInt(m[1],10)*3600 + parseInt(m[2],10)*60 + parseInt(m[3],10) + parseInt(m[4],10)/1000;
+    }
 
-  cancelBtn.addEventListener('click',()=>{ cancelled=true; statusText.textContent='Cancelled'; });
-})();
-</script>
+    // update caption preview styles
+    function updateCaptionPreview(){
+      const c = state.captionSettings;
+      captionTextPreview.style.color = c.color;
+      captionTextPreview.style.background = c.bg;
+      // position set by transform
+      captionTextPreview.style.position = 'absolute';
+      captionTextPreview.style.left = '50%';
+      captionTextPreview.style.transform = 'translateX(-50%)';
+      if(c.pos === 'bottom'){ captionTextPreview.style.bottom = '10px'; captionTextPreview.style.top = ''; }
+      else if(c.pos === 'top'){ captionTextPreview.style.top = '10px'; captionTextPreview.style.bottom = ''; }
+      else { captionTextPreview.style.top = '50%'; captionTextPreview.style.transform = 'translate(-50%,-50%)'; captionTextPreview.style.bottom = ''; }
+    }
+    // wire caption controls
+    captionColor.addEventListener('input', e => { state.captionSettings.color = e.target.value; updateCaptionPreview(); });
+    captionBg.addEventListener('input', e => { state.captionSettings.bg = e.target.value; updateCaptionPreview(); });
+    captionPosition.addEventListener('change', e => { state.captionSettings.pos = e.target.value; updateCaptionPreview(); });
+    updateCaptionPreview();
+
+    // render list
+    function renderList(){
+      listEl.innerHTML = '';
+      state.items.forEach((it, idx) => {
+        const row = document.createElement('div');
+        row.className = 'item';
+        row.dataset.idx = idx;
+        row.innerHTML = `
+          <div class="thumb"><img src="${it.url}" alt=""></div>
+          <div class="meta">
+            <div class="name">${it.file.name}</div>
+            <div class="sub small">Resolution: ${it.img.naturalWidth}×${it.img.naturalHeight}</div>
+            <div class="row" style="margin-top:6px">
+              <label class="small">Duration</label>
+              <input data-idx="${idx}" class="number dur" type="number" value="${it.duration}" min="0.2" step="0.1" style="width:80px">
+              <label class="small">Effect</label>
+              <select data-idx="${idx}" class="select eff">
+                <option value="none">None</option>
+                <option value="zoomIn">Zoom In</option>
+                <option value="zoomOut">Zoom Out</option>
+                <option value="leftToRight">Left → Right</option>
+                <option value="rightToLeft">Right → Left</option>
+                <option value="fade">Crossfade</option>
+                <option value="zoomRotate">Zoom+Rotate</option>
+                <option value="panUp">Pan Up</option>
+                <option value="panDown">Pan Down</option>
+              </select>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn ghost up">▲</button>
+            <button class="btn ghost down">▼</button>
+            <button class="btn ghost remove">Remove</button>
+          </div>
+        `;
+        listEl.appendChild(row);
+
+        // wire interactions
+        row.querySelector('.dur').addEventListener('input', e=>{
+          const v = parseFloat(e.target.value); state.items[idx].duration = (isFinite(v) && v>0)?v:1;
+        });
+        const sel = row.querySelector('.eff'); sel.value = it.effect || 'none';
+        sel.addEventListener('change', e=> state.items[idx].effect = e.target.value);
+
+        row.querySelector('.remove').addEventListener('click', e=>{
+          state.items.splice(idx,1); state.selectedItemIdx = Math.min(state.selectedItemIdx, state.items.length-1);
+          renderList();
+        });
+        row.querySelector('.up').addEventListener('click', e=>{
+          if(idx > 0){ [state.items[idx-1], state.items[idx]] = [state.items[idx], state.items[idx-1]]; renderList(); }
+        });
+        row.querySelector('.down').addEventListener('click', e=>{
+          if(idx < state.items.length-1){ [state.items[idx+1], state.items[idx]] = [state.items[idx], state.items[idx+1]]; renderList(); }
+        });
+
+        // select for preview on click
+        row.addEventListener('click', e=>{
+          state.selectedItemIdx = idx;
+          // highlight selected
+          Array.from(listEl.children).forEach((r,i)=> r.style.outline = (i===idx)?'2px solid rgba(255,140,0,0.35)':'');
+        });
+      });
+    }
+
+    // file input - add images
+    fileInput.addEventListener('change', async e=>{
+      const files = Array.from(e.target.files || []);
+      for(const f of files){
+        if(!f.type.startsWith('image/')) continue;
+        const url = URL.createObjectURL(f);
+        const img = new Image();
+        await new Promise((res,rej)=>{ img.onload = ()=>res(); img.onerror = rej; img.src = url; });
+        // pre-resize for performance to chosen size (but we keep original for aspect)
+        const pre = document.createElement('canvas');
+        // keep reasonable upper limit to avoid huge memory use
+        const maxW = 1920, maxH = 1920;
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if(w > maxW || h > maxH){
+          const r = Math.min(maxW/w, maxH/h); w = Math.round(w*r); h = Math.round(h*r);
+        }
+        pre.width = w; pre.height = h;
+        const tctx = pre.getContext('2d');
+        tctx.drawImage(img,0,0,w,h);
+        const preImg = new Image(); preImg.src = pre.toDataURL();
+        state.items.push({ id: state.nextId++, file: f, url, img: preImg, origImg: img, duration: 3, effect: 'zoomIn' });
+      }
+      renderList();
+    });
+
+    // audio input
+    audioInput.addEventListener('change', e=>{
+      state.audioFile = e.target.files[0] || null;
+    });
+
+    // SRT upload
+    srtInput.addEventListener('change', async e=>{
+      const f = e.target.files[0];
+      if(!f) return;
+      srtFileName.textContent = `Loaded: ${f.name}`;
+      const text = await f.text();
+      state.srtEntries = parseSRT(text);
+      statusText.textContent = `SRT loaded: ${f.name} (${state.srtEntries.length} captions)`;
+    });
+
+    // ===== effect preview =====
+    function computeCoverRect(sw, sh, dw, dh){
+      const sr = sw/sh, dr = dw/dh;
+      let w,h,x,y;
+      if(sr > dr){ h = dh; w = h*sr; x = (dw-w)/2; y = 0; } else { w = dw; h = w/sr; x=0; y=(dh-h)/2; }
+      return { x,y,w,h };
+    }
+
+    function playPreview(){
+      if(state.selectedItemIdx < 0 || state.selectedItemIdx >= state.items.length) {
+        alert('Select an image in the list for preview first.');
+        return;
+      }
+      const it = state.items[state.selectedItemIdx];
+      cancelAnimationFrame(previewRAF);
+      const W = previewCanvas.width, H = previewCanvas.height;
+      // use original image scaled to preview size with cover
+      const srcImg = it.origImg || it.img;
+      const rect = computeCoverRect(srcImg.naturalWidth, srcImg.naturalHeight, W, H);
+      let frame = 0, frames = Math.round( (it.duration || 3) * Math.min(30, Math.max(12, parseInt(fpsInput.value || 30))) );
+      function draw(){
+        pctx.fillStyle = '#000'; pctx.fillRect(0,0,W,H);
+        const t = frames>1 ? (frame/(frames-1)) : 0;
+        let x = rect.x, y = rect.y, w = rect.w, h = rect.h;
+        switch(it.effect){
+          case 'zoomIn': { const s = 1 + 0.2*t; w=rect.w*s; h=rect.h*s; x=(W-w)/2; y=(H-h)/2; break; }
+          case 'zoomOut': { const s = 1.2 - 0.2*t; w=rect.w*s; h=rect.h*s; x=(W-w)/2; y=(H-h)/2; break; }
+          case 'leftToRight': x = rect.x - W*(1-t); break;
+          case 'rightToLeft': x = rect.x + W*(1-t); break;
+          case 'panUp': y = rect.y + H*(1-t)*0.25; break;
+          case 'panDown': y = rect.y - H*(1-t)*0.25; break;
+          case 'zoomRotate': { pctx.save(); pctx.translate(W/2,H/2); pctx.rotate((t-0.5)*0.2); const s2 = 1+0.15*t; pctx.drawImage(srcImg, -rect.w*s2/2, -rect.h*s2/2, rect.w*s2, rect.h*s2); pctx.restore(); break; }
+          case 'fade': { pctx.globalAlpha = 1 - t; pctx.drawImage(it.prevImg || srcImg, rect.x, rect.y, rect.w, rect.h); pctx.globalAlpha = t; pctx.drawImage(srcImg, x, y, w, h); pctx.globalAlpha = 1; break; }
+          default: break;
+        }
+        if(it.effect !== 'zoomRotate' && it.effect !== 'fade') pctx.drawImage(srcImg, x, y, w, h);
+
+        // caption preview text (sample)
+        pctx.font = '20px sans-serif';
+        pctx.textAlign = 'center';
+        pctx.fillStyle = state.captionSettings.bg;
+        pctx.globalAlpha = 0.6;
+        const sample = 'Sample caption preview';
+        const measure = pctx.measureText(sample); const tw = measure.width + 20; const th = 34;
+        let yPos = state.captionSettings.pos === 'bottom' ? H - 40 : state.captionSettings.pos === 'top' ? 30 : H/2;
+        pctx.fillRect(W/2 - tw/2, yPos - th/2, tw, th);
+        pctx.globalAlpha = 1;
+        pctx.fillStyle = state.captionSettings.color;
+        pctx.fillText(sample, W/2, yPos + 6);
+
+        frame++;
+        if(frame <= frames) previewRAF = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    playPreviewBtn.addEventListener('click', playPreview);
+    stopPreviewBtn.addEventListener('click', ()=> cancelAnimationFrame(previewRAF));
+
+    // set preview canvas size responsively
+    function resizePreviewCanvas(){
+      const ratio = 16/9;
+      const W = Math.min(640, Math.max(320, Math.floor(previewCanvas.clientWidth)));
+      previewCanvas.width = W;
+      previewCanvas.height = Math.round(W / ratio);
+    }
+    window.addEventListener('resize', resizePreviewCanvas);
+    resizePreviewCanvas();
+
+    // show SRT filename if loaded
+    srtInput.addEventListener('change', ()=> {
+      const f = srtInput.files[0];
+      srtFileName.textContent = f ? `Loaded: ${f.name}` : 'No captions loaded';
+    });
+
+    // ====== FFmpeg worker setup using async-thread-worker ======
+    // We'll create a worker script (blob URL) that loads ffmpeg.wasm and listens for tasks.
+    // The thread interface provided by async-thread-worker expects a worker script path. We create a Blob and pass its URL.
+
+    // worker source JS (string)
+    const workerSource = `
+      importScripts('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js');
+      // Async message protocol: expects messages with {id, data:{task, buf}}
+      let ffmpeg = null;
+      let loaded = false;
+
+      function log(msg){
+        try{ postMessage({type:'log', msg}); }catch(e){}
+      }
+
+      async function ensureLoaded(){
+        if(loaded) return;
+        // create ffmpeg instance
+        const { createFFmpeg, fetchFile } = FFmpeg;
+        ffmpeg = createFFmpeg({ log: true });
+        await ffmpeg.load();
+        loaded = true;
+        log('[worker] ffmpeg loaded');
+      }
+
+      onmessage = async (ev) => {
+        const { id, data } = ev.data;
+        const task = data && data.task;
+        try{
+          if(task === 'convert'){
+            await ensureLoaded();
+            const arrBuf = data.buf;
+            const inName = 'in.webm';
+            const outName = 'out.mp4';
+            log('[worker] writing input file: ' + inName + ' (' + arrBuf.byteLength + ' bytes)');
+            ffmpeg.FS('writeFile', inName, new Uint8Array(arrBuf));
+            // run conversion - re-encode to h264 + aac + pixel format compatible
+            await ffmpeg.run('-y','-i', inName, '-c:v','libx264','-preset','veryfast','-crf','23','-pix_fmt','yuv420p','-c:a','aac', outName);
+            const dataOut = ffmpeg.FS('readFile', outName);
+            // transfer back buffer
+            postMessage({ id, result: { buf: dataOut.buffer } }, [dataOut.buffer]);
+          } else if(task === 'version'){
+            await ensureLoaded();
+            // ask ffmpeg version by running ffmpeg -version - should be available via run
+            // But ffmpeg.run('-version') writes to stderr; ffmpeg.wasm may not capture easily - skip heavy.
+            postMessage({ id, result: { out: 'ffmpeg.wasm loaded' } });
+          } else {
+            postMessage({ id, error: 'unknown task: ' + task });
+          }
+        }catch(err){
+          postMessage({ id, error: (err && err.message) || String(err) });
+        }
+      };
+    `;
+
+    // build blob URL for worker
+    const workerBlob = new Blob([workerSource], { type: 'application/javascript' });
+    const workerURL = URL.createObjectURL(workerBlob);
+
+    // create AsyncThreadWorker.Thread using that blob
+    // ensure AsyncThreadWorker is available
+    function ensureFFmpegThread(){
+      if(ffmpegThread) return ffmpegThread;
+      // AsyncThreadWorker.Thread expects a path - we pass the blob url
+      ffmpegThread = new AsyncThreadWorker.Thread(workerURL);
+      return ffmpegThread;
+    }
+
+    // ====== Generate video: draw frames to canvas, record WebM, optionally convert to MP4 in worker ======
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let cancelled = false;
+
+    async function generate(){
+      if(state.items.length === 0){
+        alert('Add images first');
+        return;
+      }
+      generateBtn.disabled = true;
+      cancelBtn.style.display = 'inline-block';
+      cancelBtn.disabled = false;
+      statusText.textContent = 'Recording...';
+
+      // prepare canvas size
+      const [W, H] = sizeSelect.value.split('x').map(v=>parseInt(v,10));
+      canvas.width = W; canvas.height = H;
+
+      const fps = Math.max(1, Math.min(60, parseInt(fpsInput.value,10) || 30));
+      const stream = canvas.captureStream(fps);
+
+      // attach audio if present
+      if(state.audioFile){
+        try {
+          // Use AudioContext + MediaElement to capture and route to stream
+          const audio = new Audio(URL.createObjectURL(state.audioFile));
+          audio.loop = !!loopAudioCheckbox.checked;
+          state.audioElement = audio;
+          const ctxA = new (window.AudioContext || window.webkitAudioContext)();
+          const src = ctxA.createMediaElementSource(audio);
+          const dst = ctxA.createMediaStreamDestination();
+          src.connect(dst);
+          // also connect to destination to hear audio while recording (optional)
+          src.connect(ctxA.destination);
+          // add audio tracks to stream
+          const tracks = dst.stream.getAudioTracks();
+          for(const t of tracks) stream.addTrack(t);
+        } catch(err){
+          console.warn('audio attach failed', err);
+        }
+      }
+
+      // create MediaRecorder
+      recordedChunks = [];
+      cancelled = false;
+      const mime = 'video/webm;codecs=vp9';
+      try {
+        mediaRecorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 5_000_000 });
+      } catch(err) {
+        // fallback
+        mediaRecorder = new MediaRecorder(stream);
+      }
+      mediaRecorder.ondataavailable = ev=>{
+        if(ev.data && ev.data.size) recordedChunks.push(ev.data);
+      };
+
+      const stopPromise = new Promise(resolve => mediaRecorder.onstop = resolve);
+
+      mediaRecorder.start(1000); // collect each second
+
+      // start playback of audio if present
+      if(state.audioElement){
+        try{ state.audioElement.play(); }catch(e){ console.warn(e); }
+      }
+
+      // render frames
+      let elapsed = 0;
+      const totalDur = state.items.reduce((a,b)=>a + (b.duration || 0),0);
+      let frameCount = 0;
+      const totalFrames = Math.round(totalDur * fps);
+
+      // Precompute resized images to target canvas size for perf
+      const preloaded = await Promise.all(state.items.map(async it=>{
+        const srcImg = it.origImg || it.img;
+        // draw into offscreen sized to canvas
+        const off = document.createElement('canvas'); off.width = W; off.height = H;
+        const ictx = off.getContext('2d');
+        // draw cover
+        const r = computeCoverRect(srcImg.naturalWidth, srcImg.naturalHeight, W, H);
+        ictx.fillStyle = '#000'; ictx.fillRect(0,0,W,H);
+        ictx.drawImage(srcImg, r.x, r.y, r.w, r.h);
+        const im = new Image(); im.src = off.toDataURL();
+        await new Promise(res=>im.onload = res);
+        return Object.assign({}, it, { prepared: im, preparedRect: {x:0,y:0,w:W,h:H} });
+      }));
+
+      // main loop: for each image, draw frames according to duration and effect
+      try{
+        for(let idx = 0; idx < preloaded.length; idx++){
+          if(cancelled) break;
+          const it = preloaded[idx];
+          const frames = Math.max(1, Math.round((it.duration || 1) * fps));
+          // for cross-fade effect we might need previous frame
+          const prev = idx > 0 ? preloaded[idx-1] : null;
+          for(let f = 0; f < frames; f++){
+            if(cancelled) break;
+            // draw frame
+            ctx.fillStyle = '#000'; ctx.fillRect(0,0,W,H);
+            const t = frames>1 ? (f/(frames-1)) : 0;
+            const rect = { x: 0, y:0, w: W, h: H };
+            // apply effects
+            if(it.effect === 'zoomIn'){
+              const scale = 1 + 0.2 * t;
+              const w2 = W * scale, h2 = H * scale;
+              ctx.drawImage(it.prepared, (W-w2)/2, (H-h2)/2, w2, h2);
+            } else if(it.effect === 'zoomOut'){
+              const scale = 1.2 - 0.2 * t;
+              const w2 = W * scale, h2 = H * scale;
+              ctx.drawImage(it.prepared, (W-w2)/2, (H-h2)/2, w2, h2);
+            } else if(it.effect === 'leftToRight'){
+              ctx.drawImage(it.prepared, -W*(1-t), 0, W, H);
+            } else if(it.effect === 'rightToLeft'){
+              ctx.drawImage(it.prepared, W*(1-t), 0, W, H);
+            } else if(it.effect === 'panUp'){
+              ctx.drawImage(it.prepared, 0, H*(1-t)*0.25, W, H);
+            } else if(it.effect === 'panDown'){
+              ctx.drawImage(it.prepared, 0, -H*(1-t)*0.25, W, H);
+            } else if(it.effect === 'zoomRotate'){
+              ctx.save();
+              ctx.translate(W/2, H/2);
+              ctx.rotate((t-0.5)*0.2);
+              const s = 1 + 0.15*t;
+              ctx.drawImage(it.prepared, -W*s/2, -H*s/2, W*s, H*s);
+              ctx.restore();
+            } else if(it.effect === 'fade' && prev){
+              ctx.save();
+              ctx.globalAlpha = 1 - t;
+              ctx.drawImage(prev.prepared, 0, 0, W, H);
+              ctx.globalAlpha = t;
+              ctx.drawImage(it.prepared, 0, 0, W, H);
+              ctx.restore();
+            } else {
+              ctx.drawImage(it.prepared, 0, 0, W, H);
+            }
+
+            // draw caption if applicable (check SRT by elapsed)
+            const cap = state.srtEntries.find(c => elapsed >= c.start && elapsed <= c.end);
+            if(cap){
+              const fontSize = Math.round(H * 0.05);
+              ctx.font = `bold ${fontSize}px sans-serif`;
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              const padX = 24, padY = 12;
+              let yPos = state.captionSettings.pos === 'bottom' ? H - Math.round(fontSize*1.2) : state.captionSettings.pos === 'top' ? Math.round(fontSize*1.2) : Math.round(H/2);
+              const metrics = ctx.measureText(cap.text);
+              const tw = metrics.width + padX*2;
+              const th = fontSize + padY*2;
+              ctx.fillStyle = state.captionSettings.bg;
+              ctx.globalAlpha = 0.6;
+              ctx.fillRect(W/2 - tw/2, yPos - th/2, tw, th);
+              ctx.globalAlpha = 1;
+              ctx.fillStyle = state.captionSettings.color;
+              // wrap text if too wide: basic naive wrap
+              const maxWidth = W - 40;
+              const lines = wrapText(cap.text, ctx, maxWidth);
+              const lineHeight = fontSize * 1.1;
+              const startY = yPos - ((lines.length-1) * lineHeight)/2;
+              for(let li=0; li<lines.length; li++){
+                ctx.fillText(lines[li], W/2, startY + li * lineHeight);
+              }
+            }
+
+            // update progress UI
+            frameCount++;
+            elapsed += 1/fps;
+            const percent = Math.min(100, (elapsed / totalDur) * 100);
+            barEl.style.width = percent + '%';
+            progressPercent.textContent = Math.round(percent) + '%';
+            progressTime.textContent = `${Math.floor(elapsed)}s / ${Math.floor(totalDur)}s`;
+
+            // yield to event loop so media recorder can collect frames
+            await new Promise(r => setTimeout(r, Math.round(1000/fps)));
+          }
+        }
+      } catch(err){
+        console.error('render error', err);
+      }
+
+      // stop recording
+      mediaRecorder.stop();
+      // await finish
+      await stopWhenRecorderStops();
+
+      // stop audio
+      if(state.audioElement){
+        try{ state.audioElement.pause(); state.audioElement.currentTime = 0; }catch(e){}
+      }
+
+      // assemble blob
+      const webmBlob = new Blob(recordedChunks, { type: 'video/webm' });
+
+      // if output mp4 selected, convert in worker
+      if(outputFormat.value === 'mp4'){
+        statusText.textContent = 'Converting to MP4 (this runs in a background worker) — please wait...';
+        try{
+          const thread = ensureFFmpegThread();
+          // send request with transferable buffer
+          const ab = await webmBlob.arrayBuffer();
+          const msg = { task: 'convert', buf: ab };
+          const ret = await thread.sendRequest(msg, [ab]);
+          // ret should contain { buf: ArrayBuffer }
+          if(ret && ret.buf){
+            const outBuf = ret.buf;
+            const mp4Blob = new Blob([outBuf], { type: 'video/mp4' });
+            const url = URL.createObjectURL(mp4Blob);
+            outVideo.src = url;
+            downloadLink.href = url;
+            downloadLink.download = 'slideshow.mp4';
+            downloadLink.style.display = 'inline-block';
+            statusText.textContent = 'MP4 ready';
+          } else {
+            statusText.textContent = 'Conversion returned no data';
+          }
+        } catch(err){
+          console.error(err);
+          statusText.textContent = 'Conversion error: ' + (err.message || err);
+        }
+      } else {
+        // webm: show and link
+        const url = URL.createObjectURL(webmBlob);
+        outVideo.src = url;
+        downloadLink.href = url;
+        downloadLink.download = 'slideshow.webm';
+        downloadLink.style.display = 'inline-block';
+        statusText.textContent = 'WebM ready';
+      }
+
+      generateBtn.disabled = false;
+      cancelBtn.style.display = 'none';
+    }
+
+    // helper to wait for MediaRecorder stop event
+    function stopWhenRecorderStops(){
+      return new Promise(resolve => {
+        // mediaRecorder.onstop already assigned to resolve earlier; we can resolve now after a tick
+        setTimeout(() => resolve(), 200);
+      });
+    }
+
+    // wrap text into lines for canvas
+    function wrapText(text, ctxLocal, maxWidth){
+      const words = text.split(' ');
+      const lines = [];
+      let current = '';
+      for(const w of words){
+        const test = current ? (current + ' ' + w) : w;
+        const m = ctxLocal.measureText(test);
+        if(m.width > maxWidth){
+          if(current) lines.push(current);
+          current = w;
+        } else {
+          current = test;
+        }
+      }
+      if(current) lines.push(current);
+      return lines;
+    }
+
+    // cancel
+    cancelBtn.addEventListener('click', ()=>{
+      cancelled = true;
+      if(mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+      if(state.audioElement){ try{ state.audioElement.pause(); state.audioElement.currentTime = 0; }catch(e){} }
+      generateBtn.disabled = false;
+      cancelBtn.style.display = 'none';
+      statusText.textContent = 'Cancelled';
+    });
+
+    // ensure ffmpeg thread ready when needed
+    function ensureFFmpegThread(){
+      if(ffmpegThread) return ffmpegThread;
+      // create thread
+      ffmpegThread = new AsyncThreadWorker.Thread(workerURL);
+      return ffmpegThread;
+    }
+
+    // execute generate when user clicks
+    generateBtn.addEventListener('click', async ()=>{
+      // ensure audio file reference in state
+      state.audioFile = state.audioFile || null;
+      // ensure caption settings
+      state.captionSettings.color = captionColor.value;
+      state.captionSettings.bg = captionBg.value;
+      state.captionSettings.pos = captionPosition.value;
+      // start generation
+      await generate();
+    });
+
+    // wire audio input to state
+    audioInput.addEventListener('change', e => {
+      state.audioFile = e.target.files[0] || null;
+    });
+
+    // clicking download link just downloads
+    downloadLink.addEventListener('click', ()=>{ statusText.textContent = 'Downloading...'; });
+
+    // wrap up: simple initial status
+    statusText.textContent = 'Ready';
+
+    // final: expose simple debug functions for developer console if needed
+    window._slideshowState = state;
+    window._renderList = renderList;
+
+  })();
+  </script> 
 </body>
 </html>
