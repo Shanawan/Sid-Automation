@@ -147,6 +147,20 @@ body {
   cursor: pointer;
 }
 
+.input-bar textarea {
+  flex: 1;
+  border: 1px solid #ccc;
+  resize: none;
+  overflow: hidden;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+  line-height: 1.4;
+  max-height: 4.5em; /* ~3 lines */
+}
+
+
 /* Admin Page */
 #adminPage {
   flex: 1;
@@ -205,12 +219,13 @@ body {
   </div>
 
   <div class="chat" id="chat"></div>
-
+ <!--  <img src="https://banner2.cleanpng.com/cb2/ykn/pfc/adoi6oygb.webp" alt="User" style="height:220px;"> -->
   <div class="input-bar">
-    <div class="emoji">😊</div>
-    <input type="text" id="messageInput" placeholder="Type a message" />
-    <button id="sendBtn">🎤</button>
-  </div>
+  <div class="emoji">😊</div>
+  <textarea id="messageInput" placeholder="Type a message" rows="1"></textarea>
+  <button id="sendBtn">🎤</button>
+</div>
+ <!--  <img src="https://banner2.cleanpng.com/cb2/ykn/pfc/adoi6oygb.webp" alt="User" style="height:220px;"> -->
 
   <!-- Admin Panel -->
   <div id="adminPage">
@@ -290,16 +305,26 @@ function addMessage(person, text, time){
 // Outgoing → auto typing in input (40wpm ~150ms per char)
 function typeInInput(text, callback){
   input.value = '';
+  input.style.height = "auto"; 
   let i = 0;
   const interval = setInterval(()=>{
     input.value = text.substring(0, i);
+
+    // auto expand height
+    input.style.height = "auto";
+    const maxHeight = parseInt(getComputedStyle(input).lineHeight) * 3;
+    input.style.height = Math.min(input.scrollHeight, maxHeight) + "px";
+
     i++;
     if(i > text.length){
       clearInterval(interval);
+      // reset back to single line
+      input.style.height = getComputedStyle(input).lineHeight;
       if(callback) callback();
     }
   }, 150);
 }
+
 
 // Incoming → typing indicator (3 dots)
 function showTypingIndicator(){
