@@ -1,14 +1,17 @@
-Hi ChatGPT, please create a realistic chat conversation between me and my close friend.  
-The topic of the conversation is: <b>stolen my girlfriend</b>.  
+Create a realistic chat conversation about [TOPIC] between two people in CSV format.  
 
-🔹 Rules:
-1. Maximum 20 messages (10–10 approx, but can adjust if the story needs more or less).  
-2. Use natural texting style with emojis where it makes sense.  
-3. Support <b>bold</b>, <i>italic</i>, and <mark>highlight</mark> text in the messages to emphasize emotions.  
-4. Format output strictly in this CSV pattern:  
-   "Person","Message","Time"  
-   "You","Hello, how are you? 😊","12:30 PM"  
-   "User","I'm good, thanks! How about you?","12:31 PM"  
-5. The conversation must feel like a complete short story, with a clear <mark>beginning</mark>, <i>conflict</i>, and <b>ending</b>.  
+Rules:
+1. Maximum 20 messages (roughly 10 outgoing, 10 incoming).  
+2. Messages should be short, casual texting style, natural, sometimes with emojis.  
+3. Use **bold**, *italic*, or highlight for emotions where appropriate.  
+4. Format must be CSV like this:
+"Person","Message","Time"
+"You","...","HH:MM AM/PM"
+"Friend/Other","<img src='Image1.png' alt='...' width='220px'> ...","HH:MM AM/PM"
+5. Only incoming messages (Friend/Other) should contain images. Outgoing messages (You) should not have images.  
+6. Make the conversation feel like a **complete short story** with beginning, conflict, and resolution.  
+7. Keep the conversation natural, fun, or emotional depending on the topic.  
 
-🎯 Goal: The chat should show emotional depth, betrayal, regret, and a natural closure (ending the story properly).
+[TOPIC] = Replace this with any topic you want (example: stress, weekend plans, coffee habits, travel ideas, work gossip, etc.).
+
+8. Create prompt for images given in conversation with copy button
