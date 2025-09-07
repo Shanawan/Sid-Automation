@@ -1,0 +1,14 @@
+Hi ChatGPT, please create a realistic chat conversation between me and my close friend.  
+The topic of the conversation is: <b>stolen my girlfriend</b>.  
+
+🔹 Rules:
+1. Maximum 20 messages (10–10 approx, but can adjust if the story needs more or less).  
+2. Use natural texting style with emojis where it makes sense.  
+3. Support <b>bold</b>, <i>italic</i>, and <mark>highlight</mark> text in the messages to emphasize emotions.  
+4. Format output strictly in this CSV pattern:  
+   "Person","Message","Time"  
+   "You","Hello, how are you? 😊","12:30 PM"  
+   "User","I'm good, thanks! How about you?","12:31 PM"  
+5. The conversation must feel like a complete short story, with a clear <mark>beginning</mark>, <i>conflict</i>, and <b>ending</b>.  
+
+🎯 Goal: The chat should show emotional depth, betrayal, regret, and a natural closure (ending the story properly).
