@@ -1,8 +1,6 @@
 **#Sid-Automation**
 
-[Video2.html](https://shanawan.github.io/Sid-Automation/YT/Home.html)
-
-[Video.html](https://shanawan.github.io/Sid-Automation/YT/New.html)
+[Video.html](https://shanawan.github.io/Sid-Automation/YT/index.html)
 
 [Whatsapp.html](https://shanawan.github.io/Sid-Automation/Whatsapp/index.html)
 
