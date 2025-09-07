@@ -10,7 +10,7 @@
     --blue:#0084FF;
     --bg:#f0f2f5;
   }
-  body{margin:0;font-family:Inter, "Segoe UI", Roboto, sans-serif;background:#fff;display:flex;align-items:center;justify-content:center;height:100vh;overflow:hidden}
+  body{margin:0;font-family:Inter, "Segoe UI", Roboto, sans-serif;background:#fff;display:flex;align-items:center;justify-content:center;height:92vh;overflow:hidden}
   .container{width:100%;height:100%;display:flex;flex-direction:column;box-shadow:0 0 18px rgba(0,0,0,.12)}
   .header{background:var(--blue);color:#fff;padding:10px;display:flex;align-items:center;justify-content:space-between}
   .header-left{display:flex;align-items:center;gap:10px}
@@ -43,12 +43,12 @@
   pre#demoScript{margin:0;background:#f7f7f7;padding:10px;border-radius:6px;white-space:pre-wrap;max-height:160px;overflow:auto}
   .copy-btn{background:var(--blue);color:#fff;border:none;padding:7px 12px;border-radius:6px;cursor:pointer;margin-top:10px}
   #scriptInput{width:100%;height:120px;border-radius:6px;border:1px solid #ccc;padding:8px;font-size:14px}
-  .slider-block{display:flex;flex-direction:column;gap:8px}
+  .slider-block{display:flex;flex-direction:column;gap:8px; display:block;}
   .btn-group{display:flex;gap:10px}
   .btn-group button{flex:1;padding:10px;border-radius:6px;border:none;font-weight:600;cursor:pointer}
   #startScript{background:#28a745;color:#fff}
   #clearWindow{background:#dc3545;color:#fff}
-
+.chat img{border-radius:10px}
   /* responsive narrow */
   @media (max-width:420px){
     .container{max-width:420px}
@@ -88,28 +88,25 @@
   <div class="block">
     <label><strong>Prompt & Demo (read-only)</strong></label>
     <pre id="demoScript">
+Create a realistic chat conversation about [TOPIC] between two people in CSV format.  
+
+Rules:
+1. Maximum 20 messages (roughly 10 outgoing, 10 incoming).  
+2. Messages should be short, casual texting style, natural, sometimes with emojis.  
+3. Use **bold**, *italic*, or highlight for emotions where appropriate.  
+4. Format must be CSV like this:
 "Person","Message","Time"
-"You","Hello 👋, how are you?","12:30 PM"
-"User","I'm good, thanks! <i>How about you?</i>","12:31 PM"
-"You","Not so great... I need to talk about something <b>serious</b>.","12:32 PM"
-"User","😟 What's wrong?","12:33 PM"
-"You","I found out you were <mark>hanging out</mark> with my girlfriend yesterday.","12:34 PM"
-"User","Wait... I can explain.","12:35 PM"
-"You","I saw the pictures on Instagram.","12:36 PM"
-"User","Okay, yes. We met. She said you two were having problems.","12:37 PM"
-"You","That doesn’t give you the right to <i>betray me</i>.","12:38 PM"
-"You","So you <b>stole</b> my girlfriend?","12:39 PM"
-"User","I didn’t plan it! It just <mark>happened</mark>.","12:40 PM"
-"You","Do you know how much trust you destroyed?","12:41 PM"
-"User","I’m sorry... I feel guilty every second.","12:42 PM"
-"You","Apologies won’t fix a <b>broken friendship</b>.","12:43 PM"
-"User","Please don't end our friendship...","12:44 PM"
-"You","Friendship is built on <mark>loyalty</mark>. You crossed the line.","12:45 PM"
-"User","I’ll back off. I’ll stop seeing her if it saves us.","12:46 PM"
-"You","It may be too late, but thank you. Goodbye.","12:47 PM"
-"User","😞 I understand... goodbye.","12:48 PM"
+"You","...","HH:MM AM/PM"
+"Friend/Other","<img src='Image1.png' alt='...' width='220px'> ...","HH:MM AM/PM"
+5. Only incoming messages (Friend/Other) should contain images. Outgoing messages (You) should not have images.  
+6. Make the conversation feel like a **complete short story** with beginning, conflict, and resolution.  
+7. Keep the conversation natural, fun, or emotional depending on the topic.  
+
+[TOPIC] = Replace this with any topic you want (example: stress, weekend plans, coffee habits, travel ideas, work gossip, etc.).
+
+8. Create prompt for images given in conversation with copy button
     </pre>
-    <button class="copy-btn" id="copyDemo">Copy Demo Script</button>
+    <button class="copy-btn" id="copyDemo">Copy Demo Prompt</button>
   </div>
 
   <div class="block">
