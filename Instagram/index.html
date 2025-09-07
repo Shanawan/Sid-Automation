@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,12 +13,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 92vh;
+  height: 95vh;
 }
 
 .container {
-  width: 100%;
-  max-width: 420px;
+  width: 98%;
+ 
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -199,29 +200,51 @@ function parseCSV(text){
   return rows;
 }
 
-// Play script
-function playScript(rows,index=0){
-  if(index>=rows.length) return;
+  // Auto-type function for outgoing messages
+function autoType(text, callback){
+  input.value = '';
+  let index = 0;
+  const typingInterval = setInterval(() => {
+    input.value += text[index];
+    index++;
+    // Keep send button icon in sync
+    sendBtn.innerHTML = "<i class='fas fa-paper-plane'></i>";
+    if(index >= text.length){
+      clearInterval(typingInterval);
+      callback();
+    }
+  }, 100); // typing speed in ms per character
+}
+
+// Play script function using CSV time for both outgoing and incoming
+function playScript(rows, index = 0){
+  if(index >= rows.length) return;
   const row = rows[index];
   const person = row[0].replace(/^\"|\"$/g,'');
   const message = row[1].replace(/^\"|\"$/g,'');
-  const time = row[2].replace(/^\"|\"$/g,'');
+  const csvTime = row[2].replace(/^\"|\"$/g,'');
 
   if(person.toLowerCase() === 'you'){
-    addMessage(person,message,time);
-    setTimeout(()=>playScript(rows,index+1), delay);
+    chatTitle.textContent = 'You';
+    autoType(message, () => {
+      addMessage('You', message, csvTime); // use CSV time
+      input.value = '';
+      sendBtn.innerHTML = "<i class='fas fa-microphone'></i>";
+      setTimeout(() => playScript(rows, index + 1), delay);
+    });
   } else {
     chatTitle.textContent = person;
     const typing = showTypingIndicator();
-    const typingTime = Math.max(1000,message.length*150);
-    setTimeout(()=>{
+    const typingTime = Math.max(1000, message.length * 150);
+    setTimeout(() => {
       typing.remove();
-      addMessage(person,message,time);
-      setTimeout(()=>playScript(rows,index+1), delay);
+      addMessage(person, message, csvTime); // use CSV time
+      setTimeout(() => playScript(rows, index + 1), delay);
     }, typingTime);
   }
 }
 
+  
 // Admin toggle
 backBtn.addEventListener('click', ()=>{
   const visible = adminPage.style.display === 'flex';
