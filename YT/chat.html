@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat Admin CSV Toggle</title>
+<title>Sid Chat Admin</title>
 <style>
   body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=1200&q=80') no-repeat center center fixed;
-    background-size: cover;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     padding-top: 20px;
+    background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
   }
 
   .container {
-    width: 450px;
+    width: 95%;
+    max-width: 500px;
     background: rgba(255,255,255,0.95);
     border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
@@ -38,7 +38,8 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    background: #f5f5f5;
+    background-size: cover;
+    background-position: center;
   }
 
   .message-container {
@@ -115,9 +116,9 @@
     height: 150px;
     font-family: monospace;
     margin-bottom: 10px;
-  } 
+  }
 
-  .toggle-btn {
+  .toggle-btn, .run-btn {
     width: 100%;
     padding: 10px;
     cursor: pointer;
@@ -125,26 +126,56 @@
     color: white;
     border: none;
     font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .upload-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .upload-section input {
+    flex: 1;
+  }
+
+  /* Mobile-friendly adjustments */
+  @media(max-width: 500px){
+    .chat-body { height: 350px; }
+    .message { max-width: 80%; }
   }
 </style>
 </head>
-<body> 
+<body>
 
 <div class="container">
-  <div class="chat-header"  id="toggleAdmin">Shan</div>
+  <div class="chat-header">Dynamite Chat </div>
 
-
+  <button class="toggle-btn" id="toggleAdmin">5 Online +</button>
 
   <div class="chat-body" id="chatBody"></div>
 
   <div class="admin-panel" id="adminPanel">
-    <p>Paste CSV here (Person,Message,Time):</p>
-    <textarea id="csvInput">"Person","Message","Time"
-"You","Hey! Are you ready?","10:00 AM"
-"Friend","<img src='https://via.placeholder.com/220' alt='pic' width='220px'><br>Look at this!","10:01 AM"
-"You","Wow! That looks amazing 😎","10:02 AM"
-"Friend","Yes! Can't wait to meet.","10:03 AM"</textarea>
-    <button class="toggle-btn" id="runCSV">Run Chat</button>
+    <p>Paste CSV here (Person,Message,Time,BG,DP):</p>
+    <textarea id="csvInput">"Person","Message","Time","BG","DP"
+"You","Hey! Ready for today?","10:00 AM","",""
+"Friend","<img src='' width='220px'><br>Check this out!","10:01 AM","",""
+"Friend","<img src='' width='220px'><br>Check this out!","10:01 AM","",""
+"You","Looks great 😎","10:02 AM","",""
+"Friend","Yes! Can't wait.","10:03 AM","",""</textarea>
+
+    <div class="upload-section">
+      <label>Default Background: <input type="file" id="bgUpload" accept="image/*"></label>
+    </div>
+
+    <div class="upload-section">
+      <label>Your DP: <input type="file" id="youDP" accept="image/*"></label>
+      <label>Friend DP: <input type="file" id="friendDP" accept="image/*"></label>
+    </div>
+
+    <button class="run-btn" id="runCSV">Run Chat</button>
   </div>
 </div>
 
@@ -153,36 +184,62 @@
 
 <script>
 const chatBody = document.getElementById('chatBody');
-const sendSound = document.getElementById('sendSound');
-const receiveSound = document.getElementById('receiveSound');
 const toggleBtn = document.getElementById('toggleAdmin');
 const adminPanel = document.getElementById('adminPanel');
 const runCSV = document.getElementById('runCSV');
 const csvInput = document.getElementById('csvInput');
+const bgUpload = document.getElementById('bgUpload');
+const youDPInput = document.getElementById('youDP');
+const friendDPInput = document.getElementById('friendDP');
+const sendSound = document.getElementById('sendSound');
+const receiveSound = document.getElementById('receiveSound');
 
 let adminMode = false;
+let defaultBG = '';
+let youDP = 'https://randomuser.me/api/portraits/women/65.jpg';
+let friendDP = 'https://randomuser.me/api/portraits/men/32.jpg';
 
 // Toggle admin panel
 toggleBtn.addEventListener('click', () => {
     adminMode = !adminMode;
     adminPanel.style.display = adminMode ? 'block' : 'none';
-    toggleBtn.textContent = adminMode ? 'Admin Mode' : 'ShanAwan';
+    toggleBtn.textContent = adminMode ? 'Switch to Chat Mode' : 'Switch to Admin Mode';
+});
+
+// Handle uploads
+bgUpload.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if(file) defaultBG = URL.createObjectURL(file);
+});
+youDPInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if(file) youDP = URL.createObjectURL(file);
+});
+friendDPInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if(file) friendDP = URL.createObjectURL(file);
 });
 
 // Parse CSV
 function parseCSV(data) {
-    const lines = data.split("\n").slice(1); // skip header
+    const lines = data.split("\n").slice(1);
     return lines.map(line => {
-        const match = line.match(/"(.*?)","(.*?)","(.*?)"/);
+        const match = line.match(/"(.*?)","(.*?)","(.*?)","(.*?)","(.*?)"/);
         if(match){
-            return { person: match[1], message: match[2], time: match[3] };
+            return { 
+                person: match[1], 
+                message: match[2], 
+                time: match[3], 
+                bg: match[4], 
+                dp: match[5] 
+            };
         }
         return null;
     }).filter(x=>x);
 }
 
 // Typing indicator
-function showTyping(side, avatar) {
+function showTyping(side, avatar){
     const typingDiv = document.createElement('div');
     typingDiv.className = 'typing';
     typingDiv.innerHTML = `<img class="avatar" src="${avatar}"> <div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
@@ -193,23 +250,23 @@ function showTyping(side, avatar) {
 }
 
 // Show message
-function showMessage(msg) {
+function showMessage(msg){
     const container = document.createElement('div');
-    container.className = 'message-container ' + (msg.person === 'You' ? 'right' : 'left');
+    container.className = 'message-container ' + (msg.person==='You'?'right':'left');
 
     const messageDiv = document.createElement('div');
-    messageDiv.className = 'message ' + (msg.person === 'You' ? 'right' : 'left');
-    messageDiv.innerHTML = msg.message + `<div style="font-size:10px; text-align:right; margin-top:5px;">${msg.time}</div>`;
+    messageDiv.className = 'message ' + (msg.person==='You'?'right':'left');
+    messageDiv.innerHTML = msg.message + `<div style="font-size:10px;text-align:right;margin-top:5px;">${msg.time}</div>`;
 
     const avatarImg = document.createElement('img');
     avatarImg.className = 'avatar';
-    avatarImg.src = msg.person === 'You' ? 'https://randomuser.me/api/portraits/women/65.jpg' : 'https://randomuser.me/api/portraits/men/32.jpg';
+    avatarImg.src = msg.dp || (msg.person==='You'? youDP : friendDP);
 
-    if(msg.person === 'You') {
+    if(msg.person==='You'){
         container.appendChild(messageDiv);
         container.appendChild(avatarImg);
         sendSound.play();
-    } else {
+    }else{
         container.appendChild(avatarImg);
         container.appendChild(messageDiv);
         receiveSound.play();
@@ -219,24 +276,36 @@ function showMessage(msg) {
     messageDiv.style.opacity = 1;
     chatBody.scrollTop = chatBody.scrollHeight;
 }
+// Run button
+runCSV.addEventListener('click', () => {
+    const messages = parseCSV(csvInput.value);
+    playMessages(messages);
+    // Hide admin panel after starting chat
+    adminPanel.style.display = 'none';
+    adminMode = false;
+    toggleBtn.textContent = 'Switch to Admin Mode';
+});
 
-// Play chat messages with typing
-function playMessages(messages) {
-    chatBody.innerHTML = ''; // clear previous messages
+// Play chat dynamically
+function playMessages(messages){
+    chatBody.innerHTML='';
+    chatBody.style.background = defaultBG? `url(${defaultBG})` : 'linear-gradient(to bottom, #a1c4fd, #c2e9fb)';
     let index = 0;
 
-    function nextMessage() {
+    function nextMessage(){
         if(index >= messages.length) return;
         const msg = messages[index];
-        const typingDiv = showTyping(msg.person === 'You' ? 'https://randomuser.me/api/portraits/women/65.jpg' : 'https://randomuser.me/api/portraits/men/32.jpg', msg.person);
+        // Change BG dynamically if CSV provides
+        if(msg.bg) chatBody.style.background = `url(${msg.bg})`;
+        const typingDiv = showTyping(msg.person==='You'? youDP : friendDP, msg.person);
 
-        setTimeout(() => {
+        setTimeout(()=>{
             typingDiv.remove();
             showMessage(msg);
             index++;
             setTimeout(nextMessage, 800);
-        }, 1200 + Math.random() * 800);
-    } 
+        }, 1200 + Math.random()*800);
+    }
 
     nextMessage();
 }
