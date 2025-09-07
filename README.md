@@ -5,3 +5,5 @@
 [Video.html](https://shanawan.github.io/Youtube-Automation-Video/YT/New.html)
 
 [Whatsapp.html](https://shanawan.github.io/Youtube-Automation-Video/Whatsapp/index.html)
+
+![Open Now](https://shanawan.github.io/Youtube-Automation-Video/qr.png))
