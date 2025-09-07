@@ -1,0 +1,63 @@
+You are ChatGPT. Produce a single, complete HTML file (one code block only) that implements a mobile-friendly chat simulator and admin panel. **Do not output any explanation or extra text** — only the full HTML source code. The produced HTML must work if saved as a .html file and opened in a modern browser.
+
+Requirements (implement exactly):
+
+1. Visual / layout
+   - Messenger-like theme (blue header #0084FF, light message background #f0f2f5).
+   - Header left: a back button (text "←"), a circular avatar image, and a title (id="chatTitle"). Header right: icons for call (phone), video, and info.
+   - Main chat container with id="mainContainer" containing:
+     - `.chat` area (id="chat") that auto-scrolls to bottom when new messages are added and hides scrollbars visually.
+     - Input bar (.input-bar) at bottom containing: emoji button, a multiline `<textarea id="messageInput">` (expands to max 3 lines), and a circular send/mic button (id="sendBtn") using Font Awesome icons.
+   - Separate admin panel (id="adminPage"), not inside mainContainer, styled as a vertical list of card blocks (readable on mobile). Admin panel must be hidden by default.
+   - Back button toggles visibility between mainContainer and adminPage (one visible at a time). When admin is visible, change back button if desired.
+
+2. Admin panel contents
+   - A read-only demo `pre#demoScript` block containing a demo CSV conversation (with HTML tags allowed in messages), and a "Copy Demo Script" button (id="copyDemo") that copies demo CSV to clipboard.
+   - A large textarea (`id="scriptInput"`) where user can paste CSV script.
+   - A slider (`id="delaySlider"`) with a visible numeric label (`id="delayValue"`) controlling inter-message delay in milliseconds (default 2000ms).
+   - Two buttons: Start Script (`id="startScript"`) and Clear Window (`id="clearWindow"`).
+   - Admin panel must be scrollable and use card-like blocks for each control.
+
+3. CSV format and parsing
+   - Expect CSV rows like: `"Person","Message","Time"`. Messages may include commas and must support HTML tags like `<b>`, `<i>`, `<mark>` and emojis.
+   - Implement a robust JS CSV parser that correctly handles quotes and commas inside quoted fields, and handles optional header (skip header row if it contains "Person").
+   - If `scriptInput` is empty when Start Script is clicked, fallback to a built-in demo CSV.
+
+4. Script playback behavior
+   - Implement `playScriptRows(rows)` that plays rows sequentially.
+   - Outgoing messages (Person === "You" case-insensitive):
+     - Before adding bubble, simulate auto-typing into the input `<textarea>` character-by-character at **~40 WPM (~150 ms per character)**.
+     - While auto-typing, the input should expand up to **3 lines max** (then stop expanding).
+     - After typing completes, add the outgoing message bubble to `.chat` and reset input to single-line.
+   - Incoming messages (Person !== "You"):
+     - Show a typing indicator (three animated dots bubble) for a duration calculated from the message length at **~35 WPM (~170 ms per character)** with a minimum of 1000 ms.
+     - After that delay remove typing indicator and show the full incoming bubble instantaneously (do **not** show character-by-character typing inside bubble).
+   - Each message should display the supplied Time value or, if missing, a realistic generated time string.
+   - Auto-scroll `.chat` to the bottom whenever new content is added; do not show visible scrollbars.
+
+5. Icons & send behavior
+   - Send button toggles icon between microphone and paper-plane:
+     - When the textarea contains any non-whitespace characters, show paper-plane (send).
+     - When empty, show microphone.
+   - This toggle must update continuously (including while outgoing auto-typing is running). Implement a small interval or internal updates to keep icon in sync.
+   - Clicking send button when textarea has text sends a manual outgoing message immediately (not via script), adds bubble, clears textarea, and resets icon to microphone.
+
+6. Controls & safety
+   - `Start Script` must not start another run while one is playing (disable start while playing).
+   - `Clear Window` clears `.chat`.
+   - `Copy Demo Script` copies demo CSV text to clipboard and provides short UI feedback (e.g., button text "Copied!").
+
+7. Accessibility & responsiveness
+   - The file must be mobile-first and look good on narrow screens (≤420px).
+   - Use semantic HTML where possible. Buttons must be keyboard accessible.
+
+8. Implementation details
+   - Use only client-side HTML/CSS/JS. You may link Font Awesome CDN for icons.
+   - Write clear, well-structured JS using functions for parsing, typing, playing script, DOM updates.
+   - Keep all IDs and class names as in the spec (e.g., chat, messageInput, sendBtn, adminPage, mainContainer, startScript, clearWindow, delaySlider, delayValue, demoScript, scriptInput, copyDemo).
+   - The output must be a single HTML file (one `<html>...</html>` document). **Do not** output any explanation, notes, or extra text outside the HTML code block.
+
+9. Demo CSV
+   - Include a built-in demo CSV in the admin demo area that follows your earlier example (topic: "stolen my girlfriend"), up to 20 messages, with HTML tags used in some messages, and reasonable times.
+
+Finish: Output exactly the full HTML document now.
