@@ -1,13 +1,13 @@
-**#youtube ayutomatic long video generator**
+**#Sid-Automation**
 
-[Video2.html](https://shanawan.github.io/Youtube-Automation-Video/YT/Home.html)
+[Video2.html](https://shanawan.github.io/Sid-Automation/YT/Home.html)
 
-[Video.html](https://shanawan.github.io/Youtube-Automation-Video/YT/New.html)
+[Video.html](https://shanawan.github.io/Sid-Automation/YT/New.html)
 
-[Whatsapp.html](https://shanawan.github.io/Youtube-Automation-Video/Whatsapp/index.html)
+[Whatsapp.html](https://shanawan.github.io/Sid-Automation/Whatsapp/index.html)
 
-[Messenger.html](https://shanawan.github.io/Youtube-Automation-Video/Messenger/index.html)
+[Messenger.html](https://shanawan.github.io/Sid-Automation/Messenger/index.html)
 
-[Instagram.html](https://shanawan.github.io/Youtube-Automation-Video/Instagram/index.html)
+[Instagram.html](https://shanawan.github.io/Sid-Automation/Instagram/index.html)
 
-![Open Now](https://raw.githubusercontent.com/Shanawan/Youtube-Automation-Video/refs/heads/main/qr.png)
+![Open Now](https://raw.githubusercontent.com/Shanawan/Sid-Automation/refs/heads/main/qr.png)
