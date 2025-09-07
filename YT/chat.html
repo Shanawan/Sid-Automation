@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat Admin CSV Toggle</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=1200&q=80') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  .container {
+    width: 450px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+
+  .chat-header {
+    background: #075e54;
+    color: white;
+    padding: 15px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .chat-body {
+    height: 400px;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5;
+  }
+
+  .message-container {
+    display: flex;
+    margin: 5px 0;
+    align-items: flex-end;
+  }
+
+  .message {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 20px;
+    position: relative;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    word-wrap: break-word;
+  }
+
+  .message.left {
+    background: #e5e5ea;
+    border-bottom-left-radius: 0;
+  }
+
+  .message.right {
+    background: #25d366;
+    color: white;
+    border-bottom-right-radius: 0;
+    margin-left: auto;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .typing {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    font-style: italic;
+    color: gray;
+    opacity: 0;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    background: gray;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+  }
+
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes blink {
+    0%, 20%, 50%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+    60% { opacity: 0.5; }
+  }
+
+  .admin-panel {
+    display: none;
+    padding: 10px;
+    background: #fff;
+    border-top: 1px solid #ccc;
+  }
+
+  .admin-panel textarea {
+    width: 100%;
+    height: 150px;
+    font-family: monospace;
+    margin-bottom: 10px;
+  } 
+
+  .toggle-btn {
+    width: 100%;
+    padding: 10px;
+    cursor: pointer;
+    background: #25d366;
+    color: white;
+    border: none;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body> 
+
+<div class="container">
+  <div class="chat-header"  id="toggleAdmin">Shan</div>
+
+
+
+  <div class="chat-body" id="chatBody"></div>
+
+  <div class="admin-panel" id="adminPanel">
+    <p>Paste CSV here (Person,Message,Time):</p>
+    <textarea id="csvInput">"Person","Message","Time"
+"You","Hey! Are you ready?","10:00 AM"
+"Friend","<img src='https://via.placeholder.com/220' alt='pic' width='220px'><br>Look at this!","10:01 AM"
+"You","Wow! That looks amazing 😎","10:02 AM"
+"Friend","Yes! Can't wait to meet.","10:03 AM"</textarea>
+    <button class="toggle-btn" id="runCSV">Run Chat</button>
+  </div>
+</div>
+
+<audio id="sendSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+<audio id="receiveSound" src="https://www.soundjay.com/button/button-3.mp3"></audio>
+
+<script>
+const chatBody = document.getElementById('chatBody');
+const sendSound = document.getElementById('sendSound');
+const receiveSound = document.getElementById('receiveSound');
+const toggleBtn = document.getElementById('toggleAdmin');
+const adminPanel = document.getElementById('adminPanel');
+const runCSV = document.getElementById('runCSV');
+const csvInput = document.getElementById('csvInput');
+
+let adminMode = false;
+
+// Toggle admin panel
+toggleBtn.addEventListener('click', () => {
+    adminMode = !adminMode;
+    adminPanel.style.display = adminMode ? 'block' : 'none';
+    toggleBtn.textContent = adminMode ? 'Admin Mode' : 'ShanAwan';
+});
+
+// Parse CSV
+function parseCSV(data) {
+    const lines = data.split("\n").slice(1); // skip header
+    return lines.map(line => {
+        const match = line.match(/"(.*?)","(.*?)","(.*?)"/);
+        if(match){
+            return { person: match[1], message: match[2], time: match[3] };
+        }
+        return null;
+    }).filter(x=>x);
+}
+
+// Typing indicator
+function showTyping(side, avatar) {
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'typing';
+    typingDiv.innerHTML = `<img class="avatar" src="${avatar}"> <div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+    chatBody.appendChild(typingDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    typingDiv.style.opacity = 1;
+    return typingDiv;
+}
+
+// Show message
+function showMessage(msg) {
+    const container = document.createElement('div');
+    container.className = 'message-container ' + (msg.person === 'You' ? 'right' : 'left');
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message ' + (msg.person === 'You' ? 'right' : 'left');
+    messageDiv.innerHTML = msg.message + `<div style="font-size:10px; text-align:right; margin-top:5px;">${msg.time}</div>`;
+
+    const avatarImg = document.createElement('img');
+    avatarImg.className = 'avatar';
+    avatarImg.src = msg.person === 'You' ? 'https://randomuser.me/api/portraits/women/65.jpg' : 'https://randomuser.me/api/portraits/men/32.jpg';
+
+    if(msg.person === 'You') {
+        container.appendChild(messageDiv);
+        container.appendChild(avatarImg);
+        sendSound.play();
+    } else {
+        container.appendChild(avatarImg);
+        container.appendChild(messageDiv);
+        receiveSound.play();
+    }
+
+    chatBody.appendChild(container);
+    messageDiv.style.opacity = 1;
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// Play chat messages with typing
+function playMessages(messages) {
+    chatBody.innerHTML = ''; // clear previous messages
+    let index = 0;
+
+    function nextMessage() {
+        if(index >= messages.length) return;
+        const msg = messages[index];
+        const typingDiv = showTyping(msg.person === 'You' ? 'https://randomuser.me/api/portraits/women/65.jpg' : 'https://randomuser.me/api/portraits/men/32.jpg', msg.person);
+
+        setTimeout(() => {
+            typingDiv.remove();
+            showMessage(msg);
+            index++;
+            setTimeout(nextMessage, 800);
+        }, 1200 + Math.random() * 800);
+    } 
+
+    nextMessage();
+}
+
+// Run button
+runCSV.addEventListener('click', () => {
+    const messages = parseCSV(csvInput.value);
+    playMessages(messages);
+});
+
+</script>
+
+</body>
+</html>
