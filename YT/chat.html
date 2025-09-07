@@ -31,23 +31,20 @@
     position: relative;
   }
 
-  .chat-header {
+  /* Header as button */
+  #chatHeader {
     background: #075e54;
     color: white;
     padding: 15px;
     font-weight: bold;
     text-align: center;
-  }
-
-  .toggle-btn {
-    width: 100%;
-    padding: 10px;
     cursor: pointer;
-    background: #25d366;
-    color: white;
-    border: none;
-    font-weight: bold;
-    margin-bottom: 5px;
+    transition: background 0.3s ease, transform 0.2s ease;
+    user-select: none;
+  }
+  #chatHeader:hover {
+    background: #0a7861;
+    transform: scale(1.02);
   }
 
   .chat-body {
@@ -58,89 +55,39 @@
     flex-direction: column;
     background-size: cover;
     background-position: center;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
   .chat-body::-webkit-scrollbar { display: none; }
 
-  .message-container {
-    display: flex;
-    margin: 5px 0;
-    align-items: flex-end;
-  }
-
-  .message {
-    max-width: 70%;
-    padding: 10px 15px;
-    border-radius: 20px;
-    position: relative;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-    word-wrap: break-word;
-  }
-
+  .message-container { display: flex; margin: 5px 0; align-items: flex-end; }
+  .message { max-width: 70%; padding: 10px 15px; border-radius: 20px; position: relative; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; word-wrap: break-word; }
   .message.show { opacity: 1; transform: translateY(0); }
   .message.left { background: #e5e5ea; border-bottom-left-radius: 0; }
   .message.right { background: #25d366; color: white; border-bottom-right-radius: 0; margin-left: auto; }
-
   .avatar { width: 50px; height: 50px; border-radius: 50%; margin-right: 10px; }
 
-  .typing {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    font-style: italic;
-    color: gray;
-    opacity: 0;
-  }
-  .dot {
-    width: 8px;
-    height: 8px;
-    background: gray;
-    border-radius: 50%;
-    animation: blink 1s infinite;
-  }
+  .typing { display: flex; align-items: center; gap: 5px; padding: 5px 10px; font-style: italic; color: gray; opacity: 0; }
+  .dot { width: 8px; height: 8px; background: gray; border-radius: 50%; animation: blink 1s infinite; }
   .dot:nth-child(2) { animation-delay: 0.2s; }
   .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,20%,50%,80%,100%{opacity:0.3;} 40%{opacity:1;} 60%{opacity:0.5;} }
 
-  @keyframes blink {
-    0%,20%,50%,80%,100%{opacity:0.3;}
-    40%{opacity:1;}
-    60%{opacity:0.5;}
-  }
-
-  .admin-panel {
-    display: none;
-    padding: 10px;
-    background: #fff;
-    border-top: 1px solid #ccc;
-  }
-
-  .admin-panel textarea {
-    width: 100%;
-    height: 150px;
-    font-family: monospace;
-    margin-bottom: 10px;
-  }
+  .admin-panel { display: none; padding: 10px; background: #fff; border-top: 1px solid #ccc; }
+  .admin-panel textarea { width: 100%; height: 150px; font-family: monospace; margin-bottom: 10px; }
 
   .upload-section { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
-  .upload-section input { flex: 1; }
+  .upload-section label { display: inline-block; padding: 10px 15px; background: #25d366; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; text-align: center; flex: 1; margin-bottom: 5px; transition: background 0.3s ease; }
+  .upload-section label:hover { background: #1ebe57; }
+  .upload-section input[type="file"] { display: none; }
+
+  .run-btn { width: 100%; padding: 12px; background: #128c7e; color: white; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; }
+  .run-btn:hover { background: #075e54; transform: scale(1.02); }
 
   #sceneOverlay {
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    background: rgba(0,0,0,0.6);
-    color:white;
-    padding:20px 30px;
-    font-size: 18px;
-    border-radius: 10px;
-    display:none;
-    z-index: 1000;
-    text-align:center;
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    background: rgba(0,0,0,0.6); color:white; padding:20px 30px;
+    font-size: 18px; border-radius: 10px; display:none; z-index: 1000; text-align:center;
   }
 
   @media(max-width: 400px){
@@ -153,13 +100,13 @@
 <body>
 
 <div class="container">
- <div class="chat-header" id="chatHeader">Sid Store </div>
+  <div class="chat-header" id="chatHeader">Sid Store</div>
 
   <div class="chat-body" id="chatBody"></div>
   <div id="sceneOverlay"></div>
 
   <div class="admin-panel" id="adminPanel">
-    <p>Paste multiple CSVs here. Separate scenes with --- and optional Title: </p>
+    <p>Paste multiple CSVs here. Separate scenes with --- and optional Title:</p>
     <textarea id="csvInput">Title: Morning Chat
 "Person","Message","Time","BG","DP"
 "You","Hey! Ready?","10:00 AM","",""
@@ -171,12 +118,15 @@ Title: Evening Chat
 "Friend","Hello!","06:01 PM","",""</textarea>
 
     <div class="upload-section">
-      <label>Default Background: <input type="file" id="bgUpload" accept="image/*"></label>
+      <label for="bgUpload">Choose Background</label>
+      <input type="file" id="bgUpload" accept="image/*">
     </div>
 
     <div class="upload-section">
-      <label>Your DP: <input type="file" id="youDP" accept="image/*"></label>
-      <label>Friend DP: <input type="file" id="friendDP" accept="image/*"></label>
+      <label for="youDP">Your DP</label>
+      <input type="file" id="youDP" accept="image/*">
+      <label for="friendDP">Friend DP</label>
+      <input type="file" id="friendDP" accept="image/*">
     </div>
 
     <button class="run-btn" id="runCSV">Run Chat</button>
@@ -188,7 +138,7 @@ Title: Evening Chat
 
 <script>
 const chatBody = document.getElementById('chatBody');
-const toggleBtn = document.getElementById('toggleAdminBtn');
+const chatHeader = document.getElementById('chatHeader');
 const adminPanel = document.getElementById('adminPanel');
 const runCSV = document.getElementById('runCSV');
 const csvInput = document.getElementById('csvInput');
@@ -203,7 +153,6 @@ let adminMode = false;
 let defaultBG = '';
 let youDP = 'https://randomuser.me/api/portraits/women/65.jpg';
 let friendDP = 'https://randomuser.me/api/portraits/men/32.jpg';
-const chatHeader = document.getElementById('chatHeader');
 
 chatHeader.addEventListener('click', () => {
     adminMode = !adminMode;
@@ -211,21 +160,11 @@ chatHeader.addEventListener('click', () => {
     chatHeader.textContent = adminMode ? 'Admin Mode (Click to Chat)' : 'Sid Store';
 });
 
+bgUpload.addEventListener('change', e => { const file = e.target.files[0]; if(file) defaultBG = URL.createObjectURL(file); });
+youDPInput.addEventListener('change', e => { const file = e.target.files[0]; if(file) youDP = URL.createObjectURL(file); });
+friendDPInput.addEventListener('change', e => { const file = e.target.files[0]; if(file) friendDP = URL.createObjectURL(file); });
 
-bgUpload.addEventListener('change', e => {
-    const file = e.target.files[0];
-    if(file) defaultBG = URL.createObjectURL(file);
-});
-youDPInput.addEventListener('change', e => {
-    const file = e.target.files[0];
-    if(file) youDP = URL.createObjectURL(file);
-});
-friendDPInput.addEventListener('change', e => {
-    const file = e.target.files[0];
-    if(file) friendDP = URL.createObjectURL(file);
-});
-
-// Parse scenes with optional title
+// Parse scenes
 function parseScenes(data) {
     const rawScenes = data.split('---');
     return rawScenes.map(sceneText => {
@@ -240,13 +179,7 @@ function parseScenes(data) {
         const messages = lines.map(line => {
             const match = line.match(/"(.*?)","(.*?)","(.*?)","(.*?)","(.*?)"/);
             if(match){
-                return { 
-                    person: match[1], 
-                    message: match[2], 
-                    time: match[3], 
-                    bg: match[4], 
-                    dp: match[5] 
-                };
+                return { person: match[1], message: match[2], time: match[3], bg: match[4], dp: match[5] };
             }
             return null;
         }).filter(x=>x);
@@ -254,15 +187,10 @@ function parseScenes(data) {
     });
 }
 
-// Fix broken images
 function fixBrokenImages() {
-    const images = document.querySelectorAll('img');
-    images.forEach(img => {
-        img.onerror = () => { img.src = 'https://via.placeholder.com/50?text=?'; };
-    });
+    document.querySelectorAll('img').forEach(img => { img.onerror = () => { img.src = 'https://via.placeholder.com/50?text=?'; }; });
 }
 
-// Typing indicator
 function showTyping(side, avatar){
     const typingDiv = document.createElement('div');
     typingDiv.className = 'typing';
@@ -274,7 +202,6 @@ function showTyping(side, avatar){
     return typingDiv;
 }
 
-// Show message
 function showMessage(msg){
     const container = document.createElement('div');
     container.className = 'message-container ' + (msg.person==='You'?'right':'left');
@@ -303,7 +230,6 @@ function showMessage(msg){
     chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-// Play scenes
 function playScenes(scenes, index=0){
     if(index >= scenes.length) return;
 
@@ -343,13 +269,12 @@ function playScenes(scenes, index=0){
     }, 2000);
 }
 
-// Run button
 runCSV.addEventListener('click', () => {
     const scenes = parseScenes(csvInput.value);
     playScenes(scenes);
     adminPanel.style.display = 'none';
     adminMode = false;
-    toggleBtn.textContent = 'Switch to Admin Mode';
+    chatHeader.textContent = 'Sid Store';
 });
 </script>
 </body>
