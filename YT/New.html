@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Image → Video Converter (WebM) — with Transitions</title>
+<title>Video Converter (MP4)</title>
 <style>
 :root{
   --bg:#fffef5; --panel:#fff; --muted:#ff8c00; --text:#333;
@@ -41,16 +41,15 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
 </head>
 <body>
 <div class="container">
-<header><h1>Image → Video Converter</h1><div class="muted">Client-side • WebM only</div></header>
+<header><h1>Image → Video Converter</h1><div class="muted">Client-side • WebM/MP4</div></header>
 
 <section class="card">
   <div class="row" style="justify-content:space-between">
-    <label class="btn">+ Add Images<input id="fileInput" type="file" accept="image/*" multiple></label><label class="btn ghost">+ Add Captions (SRT)<input id="srtInput" type="file" accept=".srt"></label>
-<span id="srtFileName" class="small">No captions loaded</span>
-
+    <label class="btn">+ Add Images<input id="fileInput" type="file" accept="image/*" multiple></label>
+    <label class="btn ghost">+ Add Captions (SRT)<input id="srtInput" type="file" accept=".srt"></label>
+    <span id="srtFileName" class="small">No captions loaded</span>
     <div class="small">Tip: add images, set duration and transition for each</div>
   </div>
-
   <div style="margin-top:12px" class="row">
     <label class="small">FPS</label><input id="fps" class="number" type="number" min="1" max="60" value="30" style="width:72px">
     <label class="small">Resolution</label>
@@ -61,7 +60,6 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
       <option value="1280x720">720p (1280×720)</option>
     </select>
   </div>
-
   <div style="margin-top:12px" class="row">
     <div>Total Video Length: <span id="totalDuration">0s</span></div>
   </div>
@@ -70,7 +68,6 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
 <section class="card">
   <div class="small">Images</div>
   <div id="list" class="list"></div>
-
   <div class="preview-row" style="margin-top:10px">
     <div style="flex:1">
       <div class="small">Effect Preview</div>
@@ -97,7 +94,7 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
     </div>
     <video id="outVideo" controls playsinline></video>
     <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-      <a id="downloadLink" class="btn ghost" style="display:none">⬇ Download</a>
+      <a id="downloadLink" class="btn ghost" style="display:none">⬇ Download MP4</a>
       <div id="statusText" class="small muted"></div>
     </div>
   </div>
@@ -128,6 +125,7 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
   const downloadLink=document.getElementById('downloadLink');
   const statusText=document.getElementById('statusText');
   const srtFileName=document.getElementById('srtFileName');
+
   const canvas=document.createElement('canvas');
   const ctx=canvas.getContext('2d');
 
@@ -137,7 +135,7 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
   // Update total video duration
   function updateTotalDuration(){
     let total=0;
-    state.items.forEach(it=>total+=parseFloat(it.duration || 3));
+    state.items.forEach(it=>total+=parseFloat(it.duration||3));
     totalDurationEl.textContent=Math.round(total)+'s';
   }
 
@@ -226,9 +224,8 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
     return parseInt(m[1])*3600 + parseInt(m[2])*60 + parseInt(m[3]) + parseInt(m[4])/1000;
   }
 
-  function drawCaption(ctx,caption,text,yOffset=50,fontSize=36){
-    const captionBg='black';
-    const captionColor='white';
+  function drawCaption(ctx,text,yOffset=50,fontSize=36){
+    const captionBg='black', captionColor='white';
     ctx.font = `${fontSize}px sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -238,16 +235,12 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
       const y=ctx.canvas.height-yOffset-(lines.length-i-1)*(fontSize+4);
       const width=ctx.measureText(line).width + 20;
       const height=fontSize + 10;
-      ctx.globalAlpha=0.6;
-      ctx.fillStyle=captionBg;
-      ctx.fillRect(x-width/2,y-height/2,width,height);
-      ctx.globalAlpha=1;
-      ctx.fillStyle=captionColor;
-      ctx.fillText(line,x,y);
+      ctx.globalAlpha=0.6; ctx.fillStyle=captionBg; ctx.fillRect(x-width/2,y-height/2,width,height);
+      ctx.globalAlpha=1; ctx.fillStyle=captionColor; ctx.fillText(line,x,y);
     });
   }
 
-  // Preview animation with captions
+  // Preview animation
   function playPreview(){
     if(state.selectedItemIdx<0) return alert('Select an image');
     const it=state.items[state.selectedItemIdx];
@@ -255,10 +248,9 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
     const W=previewCanvas.width,H=previewCanvas.height;
     const src=it.img;
     const frames=Math.round((it.duration||3)*parseInt(fpsInput.value||30));
-    let frame=0;
-    let videoTime=0;
+    let frame=0, videoTime=0;
     function draw(){
-      pctx.fillStyle='#000';pctx.fillRect(0,0,W,H);
+      pctx.fillStyle='#000'; pctx.fillRect(0,0,W,H);
       const t=frame/(frames-1);
       let x=0,y=0,w=W,h=H;
       switch(it.transition){
@@ -273,14 +265,7 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
       }
       if(it.transition!=='rotate') pctx.drawImage(src,x,y,W,H);
       pctx.globalAlpha=1;
-
-      // Draw captions
-      state.captions.forEach(c=>{
-        if(videoTime>=c.start && videoTime<=c.end){
-          drawCaption(pctx,c.text);
-        }
-      });
-
+      state.captions.forEach(c=>{ if(videoTime>=c.start && videoTime<=c.end) drawCaption(pctx,c.text); });
       frame++; videoTime+=1/parseInt(fpsInput.value||30);
       if(frame<frames) previewRAF=requestAnimationFrame(draw);
     }
@@ -291,7 +276,7 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
   playPreviewBtn.addEventListener('click',playPreview);
   stopPreviewBtn.addEventListener('click',stopPreview);
 
-  // Generate video with captions
+  // Generate video
   generateBtn.addEventListener('click',async()=>{
     if(state.items.length===0) return alert('Add images first');
     cancelled=false; cancelBtn.style.display='inline-block'; generateBtn.disabled=true; statusText.textContent='Starting...';
@@ -304,16 +289,14 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
     mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) recordedChunks.push(e.data); };
     mediaRecorder.start();
     const totalFrames=state.items.reduce((acc,it)=>acc+Math.round((it.duration||3)*fps),0);
-    let frameCount=0;
-    let videoTime=0;
+    let frameCount=0, videoTime=0;
 
     for(const it of state.items){
       const frames=Math.round((it.duration||3)*fps);
       for(let f=0;f<frames;f++){
         if(cancelled) break;
         ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
-        const t=f/(frames-1);
-        let x=0,y=0,fw=w,fh=h;
+        const t=f/(frames-1); let x=0,y=0,fw=w,fh=h;
         switch(it.transition){
           case 'zoomIn': { const s=1+0.2*t; fw=w*s; fh=h*s; x=(w-fw)/2; y=(h-fh)/2; break; }
           case 'zoomOut': { const s=1.2-0.2*t; fw=w*s; fh=h*s; x=(w-fw)/2; y=(h-fh)/2; break; }
@@ -326,14 +309,7 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
         }
         if(it.transition!=='rotate') ctx.drawImage(it.img,x,y,fw,fh);
         ctx.globalAlpha=1;
-
-        // Draw captions
-        state.captions.forEach(c=>{
-          if(videoTime>=c.start && videoTime<=c.end){
-            drawCaption(ctx,c.text);
-          }
-        });
-
+        state.captions.forEach(c=>{ if(videoTime>=c.start && videoTime<=c.end) drawCaption(ctx,c.text); });
         frameCount++; videoTime+=1/fps;
         barEl.style.width=Math.round(100*frameCount/totalFrames)+'%';
         progressPercent.textContent=Math.round(100*frameCount/totalFrames)+'%';
@@ -349,12 +325,12 @@ footer{margin-top:12px;text-align:right;color:#666;font-size:13px}
     statusText.textContent='Video ready';
     const blob=new Blob(recordedChunks,{type:'video/webm'});
     const url=URL.createObjectURL(blob);
-    outVideo.src=url; downloadLink.href=url; downloadLink.style.display='inline-block';
+    outVideo.src=url; downloadLink.href=url; downloadLink.download='video.mp4'; downloadLink.style.display='inline-block';
   });
 
   cancelBtn.addEventListener('click',()=>{ cancelled=true; statusText.textContent='Cancelled'; });
-})();
 
+})();
 </script>
 </body>
 </html>
